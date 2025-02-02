@@ -19,7 +19,9 @@ LOGGER_PATH = os.path.join(DIR, "app.log")
 # %(lineno)d	Line number in script
 
 class ColoredFormatter(logging.Formatter):
-    """Custom logging formatter with color support for console output."""
+    """
+    Custom logging formatter with color support for console output.
+    """
     
     COLORS = {
         "DEBUG": Fore.BLUE,
@@ -34,7 +36,9 @@ class ColoredFormatter(logging.Formatter):
         log_message = super().format(record)
         return f"{log_color}{log_message}{Style.RESET_ALL}"
 
-def setup_logging(debug:bool = False) -> None:
+def setup_logging(
+    debug:bool = False
+) -> tuple[logging.StreamHandler,logging.FileHandler]:
     """
     Configures logging settings for both console and file output.
 
@@ -71,3 +75,14 @@ def setup_logging(debug:bool = False) -> None:
     )
     
     logging.info(f"Logging setup complete. Logs saved to: {LOGGER_PATH}")
+    return console_handler, file_handler
+
+# setting up the logging
+console_log, file_log = setup_logging()
+
+def change_to_debug(change:bool) -> None:
+    if change:
+        console_log.setLevel(logging.DEBUG)
+    else:
+        console_log.setLevel(logging.WARNING)
+    

@@ -6,3 +6,5 @@ ffmpeg/
 # ignore these file extenstion
 *.pyc
 *.env
+*.ini
+*.log

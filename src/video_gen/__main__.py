@@ -1,7 +1,10 @@
+from video_gen.logger import change_to_debug
+from video_gen.parser import process_input_file
+from video_gen.engine import a_test
+
 from argparse import ArgumentParser, Namespace
-from .logger import setup_logging
-import logging
-import sys
+import logging , sys
+
 
 def parse_arguments() -> Namespace:
     """
@@ -23,22 +26,6 @@ def parse_arguments() -> Namespace:
     )
     return parser.parse_args()
 
-def process_input_file(file_path: str) -> None:
-    """
-    Reads and processes the content of the specified input file.
-    """
-    try:
-        with open(file_path, 'r') as file:
-            content = file.read()
-            logging.info("Successfully read the file content.")
-            print("File content:\n", content)
-            
-    except FileNotFoundError:
-        logging.error("Error: The file '%s' was not found.", file_path)
-        
-    except Exception as e:
-        logging.exception("An unexpected error occurred while reading the file: %s", e)
-        
 
 def main():
     """
@@ -46,8 +33,11 @@ def main():
     sets up logging, and starts processing.
     """
     args = parse_arguments()
-    setup_logging(args.debug)
-    process_input_file(args.file_path)
+    # the debug methods
+    change_to_debug(args.debug)
+    tasks = process_input_file(args.file_path)
+    a_test(tasks)
+
 
 if __name__ == "__main__":
     sys.exit(main())
