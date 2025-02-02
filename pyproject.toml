@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "sanatan-video-gen2"
+version = "0.0.2"
+description = "A package to create automate video for sanatan"
+authors = ["santan"]
+license = "custom"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+opencv-python = "^4.11.0.86"
+gtts = "^2.5.4"
+pillow = "^11.1.0"
+elevenlabs = "^1.50.6"
+requests = "^2.32.3"
+numpy = "^2.2.2"
+colorama = "^0.4.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

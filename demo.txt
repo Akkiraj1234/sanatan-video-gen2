@@ -1,0 +1,25 @@
+[title: demo1]
+video = meida/video/video1
+video = media/video/video2
+audio = media/audio/audio1
+text1 = this is demo text 
+text2 = this is demo text2
+text3 = this is demo text3 
+countdown = 3
+size = 720x1080
+frame = 30
+file_type = mp4
+template = demo_template.temp1
+
+[title: demo2]
+video = meida/video/video1
+video = media/video/video2
+audio = media/audio/audio1
+text1 = this is demo text 
+text2 = this is demo text2
+text3 = this is demo text3 
+size = 720x1080
+frame = 30
+file_type = mp4
+template = demo_template.temp2
+

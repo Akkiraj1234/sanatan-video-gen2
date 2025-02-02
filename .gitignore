@@ -1,0 +1,8 @@
+# ignore these directory
+__pycache__/
+venv/
+ffmpeg/
+
+# ignore these file extenstion
+*.pyc
+*.env
