@@ -16,6 +16,7 @@ requests = "^2.32.3"
 numpy = "^2.2.2"
 colorama = "^0.4.6"
 fonttools = "^4.55.8"
+googletrans = "2.4.0"
 
 
 [build-system]

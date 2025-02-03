@@ -144,7 +144,7 @@ class Image:
             'bit_depth': self._get_bit_depth(video_stream),
             'is_animated': self._is_animated(media_info),
             'frame_count': video_stream.get('nb_frames', 1),
-            'duration': float(video_stream.get('duration', 0)),
+            'duration': float(video_stream.get('duration', 0) if video_stream.get('duration', 0) else 0),
             'compression': video_stream.get('compression'),
         }
         

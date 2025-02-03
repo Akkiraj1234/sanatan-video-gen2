@@ -1,5 +1,7 @@
+from googletrans import Translator
 from pathlib import Path
 import os
+import uuid
 
 OS_NAME = os.name
 
@@ -39,3 +41,14 @@ def validate_executable(name: str, path: str):
 
     if not path.is_file():
         raise PermissionError(f"{name} path is not a file: {path}")
+    
+def translate_text(text, target_language='en'):
+    translator = Translator()
+    detected_language = translator.detect(text).lang
+    translated = translator.translate(text, src=detected_language, dest=target_language)
+
+    return translated.text
+
+
+def generate_unique_path(temp_path:str, file_type:str) -> str:
+    return(os.path.join(temp_path, f"{uuid.uuid4()}.{file_type}"))

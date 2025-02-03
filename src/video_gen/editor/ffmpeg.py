@@ -22,8 +22,8 @@ class FFmpeg:
         if self.__configured:
             return
         
-        self.ffmpeg_path = Path(setting.ffmpeg)
-        self.ffprobe_path = Path(setting.ffprobe)
+        self.ffmpeg_path = Path(setting.paths.ffmpeg)
+        self.ffprobe_path = Path(setting.paths.ffprobe)
         self.no_terminal = False
         self._validate_binaries()
         self.__configured = True

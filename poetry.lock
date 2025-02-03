@@ -265,6 +265,22 @@ unicode = ["unicodedata2 (>=15.1.0)"]
 woff = ["brotli (>=1.0.1)", "brotlicffi (>=0.8.0)", "zopfli (>=0.1.4)"]
 
 [[package]]
+name = "googletrans"
+version = "2.4.0"
+description = "Free Google Translate API for Python. Translates totally free of charge."
+optional = false
+python-versions = "*"
+files = [
+    {file = "googletrans-2.4.0.tar.gz", hash = "sha256:bb4e2a6ee72a24870e696a14238b7305f855a05206ecae10bd50052651984cc5"},
+]
+
+[package.dependencies]
+requests = "*"
+
+[package.extras]
+h2 = ["hyper"]
+
+[[package]]
 name = "gtts"
 version = "2.5.4"
 description = "gTTS (Google Text-to-Speech), a Python library and CLI tool to interface with Google Translate text-to-speech API"
@@ -797,4 +813,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "c5814efd3c74369406eb58039950bd78eeed6b5a3a89a6f381fdc12b4aa35595"
+content-hash = "e438b584623542aa86878c79d87debb4733cc276e4d20bb1f99af5817b7600b4"

@@ -3,6 +3,8 @@ __pycache__/
 venv/
 ffmpeg/
 
+media/temp/*
+
 # ignore these file extenstion
 *.pyc
 *.env
