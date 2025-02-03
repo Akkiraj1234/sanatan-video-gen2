@@ -9,14 +9,6 @@ import os
 DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 LOGGER_PATH = os.path.join(DIR, "app.log")
 
-# Placeholder	Meaning
-# %(asctime)s	Timestamp
-# %(levelname)s	Log level (INFO, ERROR, etc.)
-# %(name)s	Logger name
-# %(message)s	Log message
-# %(filename)s	Source filename
-# %(funcName)s	Function where log was called
-# %(lineno)d	Line number in script
 
 class ColoredFormatter(logging.Formatter):
     """

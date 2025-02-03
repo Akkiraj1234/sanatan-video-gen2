@@ -167,4 +167,4 @@ class AssetsManager(ConfigManager):
 
 
 # Create an instance
-assets = AssetsManager()
+setting = AssetsManager()

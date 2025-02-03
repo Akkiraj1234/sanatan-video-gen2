@@ -3,7 +3,7 @@ from video_gen.parser import process_input_file
 from video_gen.engine import a_test
 
 from argparse import ArgumentParser, Namespace
-import logging , sys
+import sys
 
 
 def parse_arguments() -> Namespace:
@@ -12,7 +12,7 @@ def parse_arguments() -> Namespace:
     Returns: argparse.Namespace
     """
     parser = ArgumentParser(
-        description="Video Generation System: Process a text file to generate videos."
+        description="Video Generation System: Process a text file to generate videos.",
     )
     parser.add_argument(
         "file_path",
@@ -33,10 +33,15 @@ def main():
     sets up logging, and starts processing.
     """
     args = parse_arguments()
-    # the debug methods
+    # updating logging
     change_to_debug(args.debug)
+    
+    # the main application entry
     tasks = process_input_file(args.file_path)
     a_test(tasks)
+    
+    return 0
+
 
 
 if __name__ == "__main__":
