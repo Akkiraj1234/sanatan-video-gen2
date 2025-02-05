@@ -10,6 +10,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+import subprocess
+from pathlib import Path
+from typing import List
 
 class FFmpeg:
     __instance = None
@@ -41,9 +44,9 @@ class FFmpeg:
         Validate FFmpeg binaries exist and are executable
         """
         self.update_paths(
-            ffmpeg = self.ffmpeg_path,
-            ffprobe = self.ffprobe_path,
-            error_handle = False
+            ffmpeg=self.ffmpeg_path,
+            ffprobe=self.ffprobe_path,
+            error_handle=False
         )
 
     def update_paths(self, ffmpeg:str = None, ffprobe:str = None, error_handle:bool = True) -> None:
@@ -59,7 +62,7 @@ class FFmpeg:
         paths = {"ffmpeg": ffmpeg, "ffprobe": ffprobe}
 
         for name, path in paths.items():
-            if path is None:  continue
+            if path is None: continue
             try:
                 validate_executable(name, path)
                 setattr(self, f"{name}_path", Path(path)) 
@@ -95,7 +98,7 @@ class FFmpeg:
                 kwargs['creationflags'] = subprocess.CREATE_NO_WINDOW
 
         try:
-            return subprocess.run(
+            result = subprocess.run(
                 base_command + args,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -103,9 +106,13 @@ class FFmpeg:
                 check=check,
                 **kwargs
             )
+            return result
         
         except subprocess.CalledProcessError as e:
-            raise RuntimeError(f"{command_type} error: {e.stderr.strip()}") from e
+            # Print the error message from stderr
+            error_message = e.stderr.strip() if e.stderr else "No error message available."
+            # print(f"Error occurred while running {command_type}:\n{error_message}")
+            raise RuntimeError(f"{command_type} error: {error_message}") from e
 
 
 

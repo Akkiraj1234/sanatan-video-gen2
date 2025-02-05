@@ -4,8 +4,95 @@ from pathlib import Path
 import logging, json, subprocess, os, tempfile
 from video_gen.editor.ffmpeg import FFmpeg, get_MediaInfo
 from video_gen.editor.media import Video, Audio, Image
-
+from video_gen.utility import generate_unique_path
 logger = logging.getLogger(__name__)
+
+
+from typing import List, Union
+
+
+def create_composite_video(main_media: Union[Video, Image], overlay_media_list: List[Video], output_path: str):
+    """
+    Create a composite video where the main media (video or image) is processed to have a duration equal
+    to the sum of the overlay video durations. The main media is given fade-in, fade-out, and a zoom effect.
+    Each overlay video is applied sequentially over its designated time slot.
+    """
+    ffmpeg = FFmpeg()
+    
+    total_duration = sum(float(ov.properties.get('duration', 0)) for ov in overlay_media_list)
+    if total_duration <= 0:
+        raise ValueError("Total overlay duration must be greater than zero.")
+    
+    # Determine frame rate. Use main media fps if available; otherwise default to 30.
+    fps = 30
+    if hasattr(main_media, 'properties') and main_media.properties.get('fps'):
+        fps = float(main_media.properties.get('fps'))
+    
+    # Build input arguments.
+    inputs = []
+    if isinstance(main_media, Image):
+        # For image: loop and set duration.
+        inputs.extend(["-loop", "1", "-t", str(total_duration), "-i", str(main_media.file_path)])
+    else:
+        # For video: trim to total_duration (assumes main video is long enough)
+        inputs.extend(["-t", str(total_duration), "-i", str(main_media.file_path)])
+    
+    for overlay in overlay_media_list:
+        inputs.extend(["-i", str(overlay.file_path)])
+    
+    # Calculate zoom and fade parameters
+    zoom_duration_frames = int(total_duration * fps)
+    fade_out_start = max(0.0, total_duration - 1.0)  # 1-second fade-out
+    
+    # Build the filter_complex string.
+    filter_parts = []
+    # Main media processing with zoom and fade effects, labeled as bg0
+    main_filter = (
+        f"[0:v]zoompan=z='2.0 - (2.0-1.0)*t/{total_duration}':"
+        f"x='(iw-iw/zoom)/2':y='(ih-ih/zoom)/2':d={zoom_duration_frames}:fps={fps},"
+        f"fade=t=in:st=0:d=1,fade=t=out:st={fade_out_start}:d=1[bg0];"
+    )
+    filter_parts.append(main_filter)
+    
+    # Chain overlay filters
+    current_label = "bg0"
+    current_time = 0.0
+    for idx, overlay in enumerate(overlay_media_list):
+        duration = float(overlay.properties.get('duration', 0))
+        if duration <= 0:
+            continue  # Skip invalid overlays
+        
+        # Reset overlay video timestamps
+        overlay_expr = f"[{idx+1}:v]setpts=PTS-STARTPTS[ov{idx}];"
+        filter_parts.append(overlay_expr)
+        
+        # Overlay the current overlay video onto the previous background
+        next_label = f"bg{idx+1}"
+        overlay_filter = (
+            f"[{current_label}][ov{idx}]overlay=enable='between(t,{current_time},{current_time + duration})'"
+            f"[{next_label}];"
+        )
+        filter_parts.append(overlay_filter)
+        current_label = next_label
+        current_time += duration
+    
+    # Combine the filter parts into a single filter_complex string
+    filter_complex = " ".join(filter_parts).replace('; ', ';')  # Ensure proper semicolon separation
+    
+    # Build the complete FFmpeg command
+    args = inputs + [
+        "-filter_complex", filter_complex,
+        "-map", f"[{current_label}]",
+        "-c:v", "libx264",
+        "-r", str(fps),
+        "-y",  # Overwrite output file if exists
+        output_path
+    ]
+    
+    # Execute FFmpeg command
+    result = ffmpeg.run("ffmpeg", args, True)
+    return result
+
 
 class Editor:
     def __init__(self):
@@ -64,25 +151,34 @@ class Editor:
         )
 
     def concatenate(self, inputs: List[Union[Video, Audio]], output_path: str) -> Optional[Video]:
-        """Concatenate multiple media files"""
+        """Concatenate multiple media files using FFmpeg's concat demuxer"""
         list_file = Path("concat_list.txt")
-        
+        name = inputs[0].file_path.suffix.lstrip('.')
+        output_path = generate_unique_path(output_path, name)
+
         try:
-            # Generate concat list respecting media types
+            # Generate concat list with proper escaping
             with list_file.open('w') as f:
                 for media in inputs:
-                    f.write(f"file '{media.file_path}'\n")
-            
-            return self.process_video(
-                inputs[0],
-                [
-                    "-f", "concat",
-                    "-safe", "0",
-                    "-i", str(list_file),
-                    "-c", "copy"
-                ],
-                output_path
+                    # Use absolute paths and proper escaping
+                    path = media.file_path.resolve().as_posix().replace("'", "'\\''")
+                    f.write(f"file '{path}'\n")
+
+            # Build FFmpeg command
+            args = [
+                "-f", "concat",
+                "-safe", "0",
+                "-i", str(list_file.resolve()),
+                "-c", "copy",
+                "-y",  # Overwrite output
+                str(output_path)
+            ]
+
+            self.ffmpeg.run(
+                "ffmpeg",
+                args
             )
+            return Video(output_path)
         finally:
             list_file.unlink(missing_ok=True)
 
@@ -181,6 +277,47 @@ class Editor:
             return None
         return self._create_media_object(output_path)
 
+    # def generate_video_clip(self, audio: Audio, timestamps: List[Tuple[float, float, str]], 
+    #                        images: List[Image], output_path: Path) -> Optional[Video]:
+    #     """
+    #     Generate video clip from images synchronized with audio using timestamps
+    #     Args:
+    #         audio: Audio object to use as soundtrack
+    #         timestamps: List of (start_ms, end_ms, text) for each image
+    #         images: List of Image objects in order
+    #         output_path: Output video path
+    #     """
+    #     if len(timestamps) != len(images):
+    #         logger.error("Mismatch between timestamps and images count")
+    #         return None
+
+    #     with tempfile.TemporaryDirectory() as tmpdir:
+    #         list_file = Path(tmpdir) / "concat.txt"
+            
+    #         # Generate concat list with durations
+    #         with list_file.open('w') as f:
+    #             for idx, ((start, end, _), image) in enumerate(zip(timestamps, images)):
+    #                 duration = (end - start) / 1000  # Convert ms to seconds
+    #                 f.write(f"file '{image.file_path}'\n")
+    #                 f.write(f"duration {duration:.3f}\n")
+                
+    #             # Repeat last frame to match audio length
+    #             f.write(f"file '{images[-1].file_path}'\n")
+
+    #         # Build FFmpeg command
+    #         cmd = [
+    #             "-f", "concat", "-safe", "0", "-i", str(list_file),
+    #             "-i", str(audio.file_path),
+    #             "-c:v", "libx264", "-preset", "fast",
+    #             "-pix_fmt", "yuv420p", "-movflags", "+faststart",
+    #             "-c:a", "aac", "-b:a", "192k",
+    #             "-shortest", "-y", str(output_path)
+    #         ]
+
+    #         if not self.ffmpeg.run('ffmpeg',cmd):
+    #             return None
+
+    #         return self._create_media_object(output_path)
     def generate_video_clip(self, audio: Audio, timestamps: List[Tuple[float, float, str]], 
                            images: List[Image], output_path: Path) -> Optional[Video]:
         """
@@ -198,27 +335,28 @@ class Editor:
         with tempfile.TemporaryDirectory() as tmpdir:
             list_file = Path(tmpdir) / "concat.txt"
             
+            
             # Generate concat list with durations
             with list_file.open('w') as f:
                 for idx, ((start, end, _), image) in enumerate(zip(timestamps, images)):
-                    duration = (end - start) / 1000  # Convert ms to seconds
+                    duration = (end - start) / 1000000  # Convert ms to seconds
                     f.write(f"file '{image.file_path}'\n")
                     f.write(f"duration {duration:.3f}\n")
                 
                 # Repeat last frame to match audio length
                 f.write(f"file '{images[-1].file_path}'\n")
 
-            # Build FFmpeg command
+            # Build FFmpeg command matching old method's settings
             cmd = [
                 "-f", "concat", "-safe", "0", "-i", str(list_file),
                 "-i", str(audio.file_path),
-                "-c:v", "libx264", "-preset", "fast",
-                "-pix_fmt", "yuv420p", "-movflags", "+faststart",
-                "-c:a", "aac", "-b:a", "192k",
+                "-c:v", "qtrle",              # Use QuickTime Animation (RLE) codec
+                "-pix_fmt", "argb",           # Preserve alpha channel
+                "-c:a", "aac", "-strict", "experimental",  # Required for AAC in older FFmpeg
                 "-shortest", "-y", str(output_path)
             ]
 
-            if not self.ffmpeg.run('ffmpeg',cmd):
+            if not self.ffmpeg.run('ffmpeg', cmd):
                 return None
 
             return self._create_media_object(output_path)

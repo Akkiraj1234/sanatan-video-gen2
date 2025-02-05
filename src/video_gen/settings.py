@@ -174,7 +174,7 @@ _ffprobe_path = os.path.join(_ffmpeg_folder_path, "ffprobe")
 
 _medias_path = os.path.join(DIR, "media")
 _temp_path = os.path.join(_medias_path, "temp")
-_fonts_path = os.path.join(_medias_path, "font","A_Akhil Normal.ttf")
+_fonts_path = os.path.join(_medias_path, "font","Mangal Regular.ttf")
 _download_path = DIR
 
 # _video_path = os.path.join(_medias_path, "videos")

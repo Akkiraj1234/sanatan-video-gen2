@@ -1,5 +1,5 @@
 from video_gen.logger import change_to_debug
-from video_gen.parser import process_input_file
+from video_gen.parser import parse_file, print_tasks
 from video_gen.engine import generate_demo_video
 
 from argparse import ArgumentParser, Namespace
@@ -37,7 +37,8 @@ def main():
     change_to_debug(args.debug)
     
     # the main application entry
-    tasks = process_input_file(args.file_path)
+    tasks = parse_file(args.file_path)
+    print_tasks(tasks)
     generate_demo_video(tasks)
     
     return 0
