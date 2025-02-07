@@ -1,33 +1,33 @@
-[2025-02-04 12:37:17] [INFO ] [root] [setup_logging:69] Logging setup complete. Logs saved to: /home/akkiraj/Desktop/sanatan-video-gen2/app.log
-[2025-02-04 12:37:18] [INFO ] [video_gen.editor.ffmpeg] [update_paths:69] Using path : /home/akkiraj/Desktop/sanatan-video-gen2/ffmpeg/ffmpeg for FFMPEG
-[2025-02-04 12:37:18] [INFO ] [video_gen.editor.ffmpeg] [update_paths:69] Using path : /home/akkiraj/Desktop/sanatan-video-gen2/ffmpeg/ffprobe for FFPROBE
-[2025-02-04 12:37:18] [DEBUG] [httpcore.connection] [trace:47] connect_tcp.started host='api.elevenlabs.io' port=443 local_address=None timeout=60 socket_options=None
-[2025-02-04 12:37:18] [DEBUG] [httpcore.connection] [trace:47] connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f81bf747cb0>
-[2025-02-04 12:37:18] [DEBUG] [httpcore.connection] [trace:47] start_tls.started ssl_context=<ssl.SSLContext object at 0x7f81bf7314d0> server_hostname='api.elevenlabs.io' timeout=60
-[2025-02-04 12:37:18] [DEBUG] [httpcore.connection] [trace:47] start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f81bf747f50>
-[2025-02-04 12:37:18] [DEBUG] [httpcore.http11] [trace:47] send_request_headers.started request=<Request [b'POST']>
-[2025-02-04 12:37:18] [DEBUG] [httpcore.http11] [trace:47] send_request_headers.complete
-[2025-02-04 12:37:18] [DEBUG] [httpcore.http11] [trace:47] send_request_body.started request=<Request [b'POST']>
-[2025-02-04 12:37:18] [DEBUG] [httpcore.http11] [trace:47] send_request_body.complete
-[2025-02-04 12:37:18] [DEBUG] [httpcore.http11] [trace:47] receive_response_headers.started request=<Request [b'POST']>
-[2025-02-04 12:37:18] [DEBUG] [httpcore.http11] [trace:47] receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'date', b'Tue, 04 Feb 2025 07:07:17 GMT'), (b'server', b'uvicorn'), (b'request-id', b'klvo6woXXpxx7JTOTaP1'), (b'access-control-expose-headers', b'request-id, history-item-id, character-cost, regeneration-count, generation-info, current-concurrent-requests, maximum-concurrent-requests'), (b'history-item-id', b'PLOTXyPAgR7Bcsof1Od5'), (b'current-concurrent-requests', b'1'), (b'maximum-concurrent-requests', b'4'), (b'character-cost', b'19'), (b'tts-latency-ms', b'199'), (b'Content-Length', b'11389'), (b'content-type', b'audio/mpeg'), (b'access-control-allow-origin', b'*'), (b'access-control-allow-headers', b'*'), (b'access-control-allow-methods', b'POST, PATCH, OPTIONS, DELETE, GET, PUT'), (b'access-control-max-age', b'600'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains'), (b'x-trace-id', b'33d1242eda231574c2ac8d47e7fe2e45'), (b'Via', b'1.1 google'), (b'Alt-Svc', b'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000')])
-[2025-02-04 12:37:18] [INFO ] [httpx] [_send_single_request:1025] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/Ag50Eld5oCoZVliw70iY?output_format=mp3_22050_32 "HTTP/1.1 200 OK"
-[2025-02-04 12:37:18] [DEBUG] [httpcore.http11] [trace:47] receive_response_body.started request=<Request [b'POST']>
-[2025-02-04 12:37:18] [DEBUG] [httpcore.http11] [trace:47] receive_response_body.complete
-[2025-02-04 12:37:18] [DEBUG] [httpcore.http11] [trace:47] response_closed.started
-[2025-02-04 12:37:18] [DEBUG] [httpcore.http11] [trace:47] response_closed.complete
-[2025-02-04 12:37:19] [DEBUG] [httpcore.connection] [trace:47] connect_tcp.started host='api.elevenlabs.io' port=443 local_address=None timeout=60 socket_options=None
-[2025-02-04 12:37:19] [DEBUG] [httpcore.connection] [trace:47] connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f81bf7f69f0>
-[2025-02-04 12:37:19] [DEBUG] [httpcore.connection] [trace:47] start_tls.started ssl_context=<ssl.SSLContext object at 0x7f81bf7d9750> server_hostname='api.elevenlabs.io' timeout=60
-[2025-02-04 12:37:19] [DEBUG] [httpcore.connection] [trace:47] start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f81bf7f6ab0>
-[2025-02-04 12:37:19] [DEBUG] [httpcore.http11] [trace:47] send_request_headers.started request=<Request [b'POST']>
-[2025-02-04 12:37:19] [DEBUG] [httpcore.http11] [trace:47] send_request_headers.complete
-[2025-02-04 12:37:19] [DEBUG] [httpcore.http11] [trace:47] send_request_body.started request=<Request [b'POST']>
-[2025-02-04 12:37:19] [DEBUG] [httpcore.http11] [trace:47] send_request_body.complete
-[2025-02-04 12:37:19] [DEBUG] [httpcore.http11] [trace:47] receive_response_headers.started request=<Request [b'POST']>
-[2025-02-04 12:37:20] [DEBUG] [httpcore.http11] [trace:47] receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'date', b'Tue, 04 Feb 2025 07:07:19 GMT'), (b'server', b'uvicorn'), (b'request-id', b'2WhdFgRqaRv0uOXL8iG8'), (b'access-control-expose-headers', b'request-id, history-item-id, character-cost, regeneration-count, generation-info, current-concurrent-requests, maximum-concurrent-requests'), (b'history-item-id', b'opECCaEvl9LzNHSg2tOW'), (b'current-concurrent-requests', b'1'), (b'maximum-concurrent-requests', b'4'), (b'character-cost', b'29'), (b'tts-latency-ms', b'221'), (b'Content-Length', b'15464'), (b'content-type', b'audio/mpeg'), (b'access-control-allow-origin', b'*'), (b'access-control-allow-headers', b'*'), (b'access-control-allow-methods', b'POST, PATCH, OPTIONS, DELETE, GET, PUT'), (b'access-control-max-age', b'600'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains'), (b'x-trace-id', b'9591ff8fc85a53d177be8e4ca93424d4'), (b'Via', b'1.1 google'), (b'Alt-Svc', b'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000')])
-[2025-02-04 12:37:20] [INFO ] [httpx] [_send_single_request:1025] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/Ag50Eld5oCoZVliw70iY?output_format=mp3_22050_32 "HTTP/1.1 200 OK"
-[2025-02-04 12:37:20] [DEBUG] [httpcore.http11] [trace:47] receive_response_body.started request=<Request [b'POST']>
-[2025-02-04 12:37:20] [DEBUG] [httpcore.http11] [trace:47] receive_response_body.complete
-[2025-02-04 12:37:20] [DEBUG] [httpcore.http11] [trace:47] response_closed.started
-[2025-02-04 12:37:20] [DEBUG] [httpcore.http11] [trace:47] response_closed.complete
+[2025-02-06 13:58:58] [INFO ] [root] [setup_logging:69] Logging setup complete. Logs saved to: /home/akkiraj/Desktop/sanatan-video-gen2/app.log
+[2025-02-06 13:58:59] [INFO ] [video_gen.editor.ffmpeg] [update_paths:69] Using path : /home/akkiraj/Desktop/sanatan-video-gen2/ffmpeg/ffmpeg for FFMPEG
+[2025-02-06 13:58:59] [INFO ] [video_gen.editor.ffmpeg] [update_paths:69] Using path : /home/akkiraj/Desktop/sanatan-video-gen2/ffmpeg/ffprobe for FFPROBE
+[2025-02-06 13:58:59] [DEBUG] [httpcore.connection] [trace:47] connect_tcp.started host='api.elevenlabs.io' port=443 local_address=None timeout=60 socket_options=None
+[2025-02-06 13:58:59] [DEBUG] [httpcore.connection] [trace:47] connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f9d1ea26750>
+[2025-02-06 13:58:59] [DEBUG] [httpcore.connection] [trace:47] start_tls.started ssl_context=<ssl.SSLContext object at 0x7f9d1ea2d450> server_hostname='api.elevenlabs.io' timeout=60
+[2025-02-06 13:58:59] [DEBUG] [httpcore.connection] [trace:47] start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f9d1eb64d40>
+[2025-02-06 13:58:59] [DEBUG] [httpcore.http11] [trace:47] send_request_headers.started request=<Request [b'POST']>
+[2025-02-06 13:58:59] [DEBUG] [httpcore.http11] [trace:47] send_request_headers.complete
+[2025-02-06 13:58:59] [DEBUG] [httpcore.http11] [trace:47] send_request_body.started request=<Request [b'POST']>
+[2025-02-06 13:58:59] [DEBUG] [httpcore.http11] [trace:47] send_request_body.complete
+[2025-02-06 13:58:59] [DEBUG] [httpcore.http11] [trace:47] receive_response_headers.started request=<Request [b'POST']>
+[2025-02-06 13:59:00] [DEBUG] [httpcore.http11] [trace:47] receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'date', b'Thu, 06 Feb 2025 08:28:59 GMT'), (b'server', b'uvicorn'), (b'request-id', b'jfiDAOLFcFViy3sBjS7h'), (b'access-control-expose-headers', b'request-id, history-item-id, character-cost, regeneration-count, generation-info, current-concurrent-requests, maximum-concurrent-requests'), (b'history-item-id', b'Z98YHXCPzZFgQI8jzIn3'), (b'current-concurrent-requests', b'1'), (b'maximum-concurrent-requests', b'4'), (b'character-cost', b'19'), (b'tts-latency-ms', b'242'), (b'Content-Length', b'11807'), (b'content-type', b'audio/mpeg'), (b'access-control-allow-origin', b'*'), (b'access-control-allow-headers', b'*'), (b'access-control-allow-methods', b'POST, PATCH, OPTIONS, DELETE, GET, PUT'), (b'access-control-max-age', b'600'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains'), (b'x-trace-id', b'c392859ad0db852c948cac31987db4f6'), (b'Via', b'1.1 google'), (b'Alt-Svc', b'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000')])
+[2025-02-06 13:59:00] [INFO ] [httpx] [_send_single_request:1025] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/Ag50Eld5oCoZVliw70iY?output_format=mp3_22050_32 "HTTP/1.1 200 OK"
+[2025-02-06 13:59:00] [DEBUG] [httpcore.http11] [trace:47] receive_response_body.started request=<Request [b'POST']>
+[2025-02-06 13:59:00] [DEBUG] [httpcore.http11] [trace:47] receive_response_body.complete
+[2025-02-06 13:59:00] [DEBUG] [httpcore.http11] [trace:47] response_closed.started
+[2025-02-06 13:59:00] [DEBUG] [httpcore.http11] [trace:47] response_closed.complete
+[2025-02-06 13:59:02] [DEBUG] [httpcore.connection] [trace:47] connect_tcp.started host='api.elevenlabs.io' port=443 local_address=None timeout=60 socket_options=None
+[2025-02-06 13:59:03] [DEBUG] [httpcore.connection] [trace:47] connect_tcp.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f9d1eafd850>
+[2025-02-06 13:59:03] [DEBUG] [httpcore.connection] [trace:47] start_tls.started ssl_context=<ssl.SSLContext object at 0x7f9d1eacdbd0> server_hostname='api.elevenlabs.io' timeout=60
+[2025-02-06 13:59:03] [DEBUG] [httpcore.connection] [trace:47] start_tls.complete return_value=<httpcore._backends.sync.SyncStream object at 0x7f9d1ead9220>
+[2025-02-06 13:59:03] [DEBUG] [httpcore.http11] [trace:47] send_request_headers.started request=<Request [b'POST']>
+[2025-02-06 13:59:03] [DEBUG] [httpcore.http11] [trace:47] send_request_headers.complete
+[2025-02-06 13:59:03] [DEBUG] [httpcore.http11] [trace:47] send_request_body.started request=<Request [b'POST']>
+[2025-02-06 13:59:03] [DEBUG] [httpcore.http11] [trace:47] send_request_body.complete
+[2025-02-06 13:59:03] [DEBUG] [httpcore.http11] [trace:47] receive_response_headers.started request=<Request [b'POST']>
+[2025-02-06 13:59:03] [DEBUG] [httpcore.http11] [trace:47] receive_response_headers.complete return_value=(b'HTTP/1.1', 200, b'OK', [(b'date', b'Thu, 06 Feb 2025 08:29:02 GMT'), (b'server', b'uvicorn'), (b'request-id', b'8dO2V5BvO6eLakkXnyaW'), (b'access-control-expose-headers', b'request-id, history-item-id, character-cost, regeneration-count, generation-info, current-concurrent-requests, maximum-concurrent-requests'), (b'history-item-id', b'uyXmdzBS52sOlIb7HyYz'), (b'current-concurrent-requests', b'1'), (b'maximum-concurrent-requests', b'4'), (b'character-cost', b'29'), (b'tts-latency-ms', b'223'), (b'Content-Length', b'15151'), (b'content-type', b'audio/mpeg'), (b'access-control-allow-origin', b'*'), (b'access-control-allow-headers', b'*'), (b'access-control-allow-methods', b'POST, PATCH, OPTIONS, DELETE, GET, PUT'), (b'access-control-max-age', b'600'), (b'strict-transport-security', b'max-age=31536000; includeSubDomains'), (b'x-trace-id', b'2af339cd85542c92d4f98544209e5aa3'), (b'Via', b'1.1 google'), (b'Alt-Svc', b'h3=":443"; ma=2592000,h3-29=":443"; ma=2592000')])
+[2025-02-06 13:59:03] [INFO ] [httpx] [_send_single_request:1025] HTTP Request: POST https://api.elevenlabs.io/v1/text-to-speech/Ag50Eld5oCoZVliw70iY?output_format=mp3_22050_32 "HTTP/1.1 200 OK"
+[2025-02-06 13:59:03] [DEBUG] [httpcore.http11] [trace:47] receive_response_body.started request=<Request [b'POST']>
+[2025-02-06 13:59:03] [DEBUG] [httpcore.http11] [trace:47] receive_response_body.complete
+[2025-02-06 13:59:03] [DEBUG] [httpcore.http11] [trace:47] response_closed.started
+[2025-02-06 13:59:03] [DEBUG] [httpcore.http11] [trace:47] response_closed.complete

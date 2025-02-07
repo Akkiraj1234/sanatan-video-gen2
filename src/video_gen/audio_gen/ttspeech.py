@@ -1,8 +1,7 @@
-from video_gen.settings import setting
 from video_gen.editor.media import Audio
 from video_gen.utility import translate_text, generate_unique_path
 from typing import List
-
+temp_path = "/home/akkiraj/Desktop/sanatan-video-gen2/media/temp"
 
 # importing other modules
 try:
@@ -32,12 +31,7 @@ def get_timestamps(text:str, audio:Audio):
         raise ValueError("Argument 'audio' should be an instance of Audio")
     
     words = text.split()
-    duration = audio.properties.get("duration", None)
-    
-    if duration is None:
-        raise BadStreamFile("Audio does not have a valid duration")
-    
-    word_duration = (duration * 1000) / len(words)
+    word_duration = (audio.duration * 1000) / len(words)
     timestamps = []
     
     for idx, word in enumerate(words):
@@ -48,7 +42,7 @@ def get_timestamps(text:str, audio:Audio):
     return timestamps
 
 
-def TTS_gtts(script:str, tts_info:dict, output_path: str = "output.mp4") -> str:
+def TTS_gtts(script:str, output_path: str = "output.mp4") -> str:
     """
     Generate a Text-to-Speech (TTS) audio file and save it in the temporary file path.
 
@@ -59,8 +53,8 @@ def TTS_gtts(script:str, tts_info:dict, output_path: str = "output.mp4") -> str:
     Returns:
         str: The path of the generated wav audio file.
     """
-    slow = tts_info.get("slow", False)
-    lang = tts_info.get("lang", "hi")
+    slow = False # will add setting later
+    lang = "hi" # will add setting later
     
     try:
         tts = gtts.gTTS(
@@ -76,11 +70,11 @@ def TTS_gtts(script:str, tts_info:dict, output_path: str = "output.mp4") -> str:
         raise e from None 
     
 
-def TTS_elevenlabs(script:str, tts_info:dict, output_path:str = "output.mp4") -> tuple[str,List[int]]|str:
-    voice_id = tts_info.get("voice_id", "Ag50Eld5oCoZVliw70iY")# 1. nsuWityFzyjklsOeHYMt # 2. Ag50Eld5oCoZVliw70iY
-    model_id = tts_info.get("model_id","eleven_turbo_v2_5")
-    output_format="mp3_22050_32"
-    api_key = tts_info.get('api_key')
+def TTS_elevenlabs(script:str, output_path:str = "output.mp4") -> tuple[str,List[int]]|str:
+    voice_id = "Ag50Eld5oCoZVliw70iY" # 1. nsuWityFzyjklsOeHYMt # 2. Ag50Eld5oCoZVliw70iY
+    model_id = "eleven_turbo_v2_5"
+    output_format= "mp3_22050_32"
+    api_key = "sk_9dadd4b84c2879c59a5e6078977235c224ccc8aa5ca1d797"
     
     # api key setup
     client = elevenlabs.ElevenLabs(api_key=api_key)
@@ -101,7 +95,7 @@ def TTS_elevenlabs(script:str, tts_info:dict, output_path:str = "output.mp4") ->
         for chunk in response:
             if chunk: f.write(chunk)
     
-    return output_path
+    return Audio(output_path)
 
 
 def get_tts(name:str) -> tuple[callable,bool]:
@@ -116,21 +110,18 @@ def get_tts(name:str) -> tuple[callable,bool]:
 class Tts:
     def __init__(self, tts_use:str = None):
         if tts_use is None:
-            tts_use = setting.general.tts_eng
+            tts_use = "elevenlabs" # will use settings
         
         self.tts, works = get_tts(tts_use)
         if not works:
             raise BadStreamFile("unable to import tts "+tts_use)
     
-    def create(self, script, lang = "hi") -> str:
+    def create(self, script, lang = "hi") -> Audio:
         translated_text = script
-        output_path = generate_unique_path(setting.paths.temp,"mp3")
+        output_path = generate_unique_path(temp_path,"mp3") # temp path from settings
         return self.tts(
             script = translated_text,
             output_path = output_path,
-            tts_info = {
-                "api_key":setting.api.elevenlabs
-            }
         )
     
 

@@ -1,1 +1,1 @@
-from .ttspeech import Tts, get_timestamps
+from video_gen.audio_gen.ttspeech import Tts, get_timestamps

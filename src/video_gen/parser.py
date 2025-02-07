@@ -1,9 +1,5 @@
-from collections import namedtuple
-import logging
+from video_gen.editor.media import Video
 import re
-
-# logging configuration
-logger = logging.getLogger(__name__)
 
 
 def process_input_file(file_path: str) -> None:
@@ -13,33 +9,20 @@ def process_input_file(file_path: str) -> None:
     try:
         with open(file_path, 'r') as file:
             content = file.read()
-            logger.info("Successfully read the file content.")
-            # print("File content:\n", content)
+            print("Successfully read the file content.")
             
     except FileNotFoundError:
-        logger.error("Error: The file '%s' was not found.", file_path)
+        print("Error: The file '%s' was not found.", file_path)
         
     except Exception as e:
-        logger.exception("An unexpected error occurred while reading the file: %s", e)
+        print("An unexpected error occurred while reading the file: %s", e)
 
 
-
-class Video:
-    """Dummy class to represent media files"""
-    def __init__(self, path):
-        self.path = path
-        
-    def __repr__(self):
-        return f"Video('{self.path}')"
-
-import re
-import os
-
-# Make sure you have the Video class defined/imported appropriately.
-# from video_gen.editor.ffmpeg import Video  # Example import
 
 def parse_file(file_path):
-    """Parse the file and return a list of task lists."""
+    """
+    Parse the file and return a list of task lists.
+    """
     with open(file_path, 'r') as f:
         content = f.read()
 
@@ -53,7 +36,7 @@ def parse_file(file_path):
         # Default metadata values
         metadata = {
             'frame': 30,
-            'size': (1920, 1080),
+            'size': (1080, 1920),
             'file_type': 'mp4',
             'file_name': title,
             'template': None,
@@ -112,30 +95,29 @@ def parse_file(file_path):
     
     return tasks_list
 
-def print_tasks(tasks_list):
+def print_tasks(tasks):
     """Print tasks in a visual format from the list of tasks."""
-    for tasks in tasks_list:
-        metadata = tasks[0]
-        media_items = tasks[1:]
-        
-        print(f"▌ Title: {metadata['file_name']}")
-        print(f"├─ Template: {metadata['template']}")
-        print(f"├─ Size: {metadata['size'][0]}x{metadata['size'][1]}")
-        print(f"├─ Frame Rate: {metadata['frame']}")
-        print(f"├─ File Type: {metadata['file_type']}")
-        print("├─ Media Items:")
-        for i, item in enumerate(media_items, 1):
-            # Decide the media type by checking for the key in the dictionary
-            if 'video' in item:
-                media_type = 'video'
-                icon = '🎥'
-            else:
-                media_type = 'image'
-                icon = '🖼'
-            texts = ', '.join(item.get('text', []))
-            # Assuming the Video (or Image) object has a .path attribute
-            print(f"│  ╰─ {icon} Pair {i}: {item[media_type].path}")
-            print(f"│     ╰─ Texts: {texts or 'None'}")
-        print(f"├─ Audio Files: {metadata['bg_audio'] or 'None'}")
-        print("╰─" + "─" * 40 + "\n")
+    metadata = tasks[0]
+    media_items = tasks[1:]
+    
+    print(f"▌ Title: {metadata['file_name']}")
+    print(f"├─ Template: {metadata['template']}")
+    print(f"├─ Size: {metadata['size'][0]}x{metadata['size'][1]}")
+    print(f"├─ Frame Rate: {metadata['frame']}")
+    print(f"├─ File Type: {metadata['file_type']}")
+    print("├─ Media Items:")
+    for i, item in enumerate(media_items, 1):
+        # Decide the media type by checking for the key in the dictionary
+        if 'video' in item:
+            media_type = 'video'
+            icon = '🎥'
+        else:
+            media_type = 'image'
+            icon = '🖼'
+        texts = ', '.join(item.get('text', []))
+        # Assuming the Video (or Image) object has a .path attribute
+        print(f"│  ╰─ {icon} Pair {i}: {item[media_type].file_path}")
+        print(f"│     ╰─ Texts: {texts or 'None'}")
+    print(f"├─ Audio Files: {metadata['bg_audio'] or 'None'}")
+    print("╰─" + "─" * 40 + "\n")
 

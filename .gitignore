@@ -4,6 +4,9 @@ venv/
 ffmpeg/
 
 media/temp/*
+src-old/*
+test-ffmpeg-engion/
+test-ffmpeg-engion/*
 
 # ignore these file extenstion
 *.pyc

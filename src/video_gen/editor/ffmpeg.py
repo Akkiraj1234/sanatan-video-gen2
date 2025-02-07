@@ -1,35 +1,27 @@
-from video_gen.utility import validate_executable, Path, OS_NAME
-from video_gen.settings import setting
-
-from typing import Dict, Any, List, Optional
+from video_gen.utility import validate_executable, OS_NAME, validate_file
+from typing import Dict, Any, List
 import subprocess
 import json
 
-# logger and info
-import logging
-logger = logging.getLogger(__name__)
+# Default data to use for rn
+ffmpeg_path = "/home/akkiraj/Desktop/sanatan-video-gen2/ffmpeg/ffmpeg"
+ffprobe_path = "/home/akkiraj/Desktop/sanatan-video-gen2/ffmpeg/ffprobe"
+terminal = False
+terminal_info = ['-hide_banner', '-loglevel error', '-progress pipe:1']
 
-
-import subprocess
-from pathlib import Path
-from typing import List
 
 class FFmpeg:
     __instance = None
-    __configured = False
-    
+    # __configured = False
     def __init__(self) -> None:
-        """
+        """Path
         Initialize with paths to FFmpeg binaries.
-        """
-        if self.__configured:
-            return
-        
-        self.ffmpeg_path = Path(setting.paths.ffmpeg)
-        self.ffprobe_path = Path(setting.paths.ffprobe)
-        self.no_terminal = False
+        """        
+        self.ffmpeg_path = ffmpeg_path
+        self.ffprobe_path = ffprobe_path
+        self.no_terminal = terminal
         self._validate_binaries()
-        self.__configured = True
+        # self.__configured = True
     
     def __new__(cls, *args, **kwargs) -> None:
         """
@@ -62,15 +54,14 @@ class FFmpeg:
         paths = {"ffmpeg": ffmpeg, "ffprobe": ffprobe}
 
         for name, path in paths.items():
-            if path is None: continue
+            if path is None: 
+                continue
             try:
                 validate_executable(name, path)
-                setattr(self, f"{name}_path", Path(path)) 
-                logger.info(f"Using path : {path} for {name.upper()}")
+                setattr(self, f"{name}_path", path)
                 
             except (FileNotFoundError, PermissionError) as e:
                 if not error_handle: raise e from None
-                logger.warning(f"Invalid path ({path}) for {name.upper()}. Retaining original path. error {e}")
         
     def run(self, command_type:str, args:List[str], check:bool = True) -> subprocess.CompletedProcess:
         """
@@ -87,9 +78,11 @@ class FFmpeg:
         kwargs = {}
         
         if command_type == 'ffmpeg':
-            base_command = [str(self.ffmpeg_path)]
+            base_command = [str(self.ffmpeg_path)] + terminal_info
+            
         elif command_type == 'ffprobe':
             base_command = [str(self.ffprobe_path)]
+            
         else:
             raise ValueError("Invalid command type. Use 'ffmpeg' or 'ffprobe'")
         
@@ -99,7 +92,7 @@ class FFmpeg:
 
         try:
             result = subprocess.run(
-                base_command + args,
+                base_command + args,# + terminal_info,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
@@ -109,104 +102,175 @@ class FFmpeg:
             return result
         
         except subprocess.CalledProcessError as e:
-            # Print the error message from stderr
             error_message = e.stderr.strip() if e.stderr else "No error message available."
-            # print(f"Error occurred while running {command_type}:\n{error_message}")
-            raise RuntimeError(f"{command_type} error: {error_message}") from e
+            raise RuntimeError(f"{command_type} \nERROR: {error_message}") from e
 
 
-
-class MediaProbe:
-    _SUPPORTED_MEDIA_TYPES = frozenset(('video', 'audio', 'subtitle', 'data'))
+# do not support these:-
+# Broadcast TV (DVB, ATSC, IPTV)
+# Live streaming protocols (MPEG-TS, HLS)
+# Satellite and cable transmissions
+class MediaInfo:
+    """
+    A class to extract and store metadata from media files using ffprobe.
     
-    @staticmethod
-    def process_media_info(raw_data: Dict) -> Dict[str, Any]:
-        """Process and normalize raw ffprobe output"""
-        return {
-            "format": MediaProbe._process_format(raw_data.get("format", {})),
-            "streams": [MediaProbe._process_stream(s) for s in raw_data.get("streams", [])],
-            "chapters": raw_data.get("chapters", []),
-            "programs": raw_data.get("programs", []),
-            "summary": MediaProbe._generate_summary(raw_data)
-        }
+    Attributes:
+        _SUPPORTED_MEDIA_TYPES (tuple): Supported media types (video, audio, image).
+        media_data (dict): Raw media data from ffprobe.
+        STREAMS (list): List of processed media streams.
+        VIDEO (int): Number of video streams detected.
+        AUDIO (int): Number of audio streams detected.
+        filename (str): Media file name.
+        format (str): Media format type.
+        duration (float): Duration of the media in seconds.
+        size (int): File size in bytes.
+        bit_rate (int): Bit rate of the media.
+        nb_streams (int): Number of streams in the media.
+        creation_time (str): Media creation timestamp (if available).
+    """
+    _SUPPORTED_MEDIA_TYPES = ('video', 'audio', 'image')
+    
+    def __repr__(self) -> str:
+        """a repr function"""
+        return f"MediaInfo(filename={self.filename}, format={self.format}, VIDEO={self.VIDEO}, AUDIO={self.AUDIO})"
 
-    @staticmethod
-    def _process_format(format_info: Dict) -> Dict:
-        numeric_fields = [
-            'duration', 'size', 'bit_rate', 
-            'probe_score', 'nb_streams'
-        ]
-        return {
-            **format_info,
-            **{k: MediaProbe._try_convert_number(format_info.get(k)) 
-               for k in numeric_fields}
-        }
-
-    @staticmethod
-    def _process_stream(stream_info: Dict) -> Dict:
-        numeric_fields = [
-            'duration', 'bit_rate', 'width', 'height',
-            'sample_aspect_ratio', 'display_aspect_ratio',
-            'sample_rate', 'channels', 'bits_per_sample',
-            'frame_count', 'r_frame_rate', 'avg_frame_rate'
-        ]
-        
-        processed = {
-            **stream_info,
-            **{k: MediaProbe._try_convert_number(stream_info.get(k)) 
-               for k in numeric_fields}
-        }
-        
-        for rate in ['r_frame_rate', 'avg_frame_rate']:
-            if processed.get(rate):
-                processed[f'{rate}_float'] = MediaProbe._parse_frame_rate(processed[rate])
-                
-        return processed
-
-    @staticmethod
-    def _try_convert_number(value: str) -> Any:
+    def __len__(self) -> int:
+        """return length of stream"""
+        return self.duration
+    
+    def __str__(self) -> str:
+        """return file path of stream"""
+        return self.filename
+    
+    def _try_convert_number(self, value: str) -> float|int:
+        """
+        Attempts to convert a string to an integer or float,
+        rounding to two decimal places if necessary.
+        """
         try:
-            return float(value) if '.' in value else int(value)
+            return round(float(value),2) if '.' in value else int(value)
         except (TypeError, ValueError):
             return value
-
-    @staticmethod
-    def _parse_frame_rate(frame_rate: str) -> Optional[float]:
+    
+    def _parse_frame_rate(self, rate_str: str) -> float:
+        """Convert fraction frame rate to float."""
         try:
-            numerator, denominator = map(float, frame_rate.split('/'))
-            return numerator / denominator if denominator != 0 else None
+            parts = rate_str.split('/')
+            if len(parts) == 2:
+                numerator = float(parts[0])
+                denominator = float(parts[1])
+                return round(numerator / denominator if denominator != 0 else 0.0,2)
+            
+            return round(float(rate_str),2)
         except Exception:
-            return None
+            return 0.0
+        
+    def __init__(self, media_data:Dict[str, Any]) -> None:
+        """
+        Initializes MediaInfo with raw media data.
+        
+        Args:
+            media_data (Dict[str, Any]): meida json data by ffprobe
+        """
+        self.media_data = media_data
+        self.STREAMS = []
+        self.VIDEO = 0
+        self.AUDIO = 0
+        self._process_format()
+        self._process_streams()
 
-    @classmethod
-    def _generate_summary(cls, raw_data: Dict) -> Dict[str, Any]:
-        format_info = raw_data.get("format", {})
-        streams = raw_data.get("streams", [])
+    def _process_format(self) -> None:
+        """
+        Extracts general metadata (format, duration, size, bit rate, etc.)
+        from the media file.
+        """
+        format_ = self.media_data.get('format', {})
+        self.filename = format_.get('filename', None)
+        self.format = format_.get('format_name', None)
+        self.duration = self._try_convert_number(format_.get('duration', "0"))
+        self.size = self._try_convert_number(format_.get('size', "0"))
+        self.bit_rate = self._try_convert_number(format_.get('bit_rate', "0"))
+        self.nb_streams = int(format_.get('nb_streams', 0))
+        self.creation_time = format_.get('tags', {}).get('creation_time', None)
+
+    def _process_video_streams(self, data:Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Processes metadata for video streams.
+        """
         return {
-            "media_type": cls._detect_media_type(streams),
-            "duration": cls._try_convert_number(format_info.get("duration")),
-            "size": cls._try_convert_number(format_info.get("size")),
-            "bit_rate": cls._try_convert_number(format_info.get("bit_rate")),
-            "stream_count": len(streams)
+            'index': data.get('index'),
+            'codec_name': data.get('codec_name', None),
+            'codec_tag_string': data.get('codec_tag_string', None),
+            'width': data.get('width', 0),
+            'height': data.get('height', 0),
+            'pix_fmt': data.get('pix_fmt', None),
+            'r_frame_rate': self._parse_frame_rate(data.get('r_frame_rate', '0/1')),
+            'time_base': self._parse_frame_rate(data.get('time_base', '0/1')),
+            'duration_ts': int(self._try_convert_number(data.get('duration_ts', 0))),
+            'duration': self._try_convert_number(data.get('duration', "0")),
+            'bit_rate': self._try_convert_number(data.get('bit_rate', "0")),
+            'nb_frames': self._try_convert_number(data.get('nb_frames', 0)),
+            'type': 'video'
         }
 
-    @classmethod
-    def _detect_media_type(cls, streams: List[Dict]) -> Optional[str]:
-        found_types = {s['codec_type'] for s in streams if 'codec_type' in s}
-        for media_type in cls._SUPPORTED_MEDIA_TYPES:
-            if media_type in found_types:
-                return media_type
-        return None
+    def _process_audio_streams(self, data: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Processes metadata for audio streams.
+        """
+        return {
+            'index': data.get('index'),
+            'codec_name': data.get('codec_name', None),
+            'codec_tag_string': data.get('codec_tag_string', None),
+            'sample_fmt': data.get('sample_fmt', None),
+            'sample_rate': self._try_convert_number(data.get('sample_rate', "0")),
+            'channels': int(data.get('channels', 0)),
+            'bits_per_sample': self._try_convert_number(data.get('bits_per_sample', 0)),
+            'r_frame_rate': self._parse_frame_rate(data.get('r_frame_rate', '0/1')),
+            'time_base': self._parse_frame_rate(data.get('time_base', '0/1')),
+            'duration_ts': int(self._try_convert_number(data.get('duration_ts', 0))),
+            'duration': self._try_convert_number(data.get('duration', "0")),
+            'bit_rate': self._try_convert_number(data.get('bit_rate', "0")),
+            'nb_frames': self._try_convert_number(data.get('nb_frames', 0)),
+            'type': 'audio'
+        }
 
-    @staticmethod
-    def save_to_json(data: Dict, output_path: str) -> None:
-        with open(output_path, 'w') as file:
-            json.dump(data, file, indent=2)
+    def _process_streams(self) -> None:
+        """
+        Processes all media streams (video/audio) 
+        and updates the STREAMS list.
+        """
+        for stream in self.media_data.get("streams", []):
+            codec_type = stream.get("codec_type")
+            if codec_type == "video":
+                processed_stream = self._process_video_streams(stream)
+                self.VIDEO += 1
+            elif codec_type == "audio":
+                processed_stream = self._process_audio_streams(stream)
+                self.AUDIO += 1
+            else:
+                continue
+            self.STREAMS.append(processed_stream)
+            
 
+def get_MediaInfo(file_path: str) -> MediaInfo:
+    """
+    Extracts and returns detailed media metadata using ffprobe.
 
+    This function checks if the given media file exists and then invokes ffprobe
+    to retrieve format, stream, chapter, and program information in JSON format.
+    The extracted metadata is parsed and returned as a MediaInfo object.
 
-def get_MediaInfo(file_path: str) -> Dict[str, Any]:
-    if not Path(file_path).exists():
+    Args:
+        file_path (str): The path to the media file.
+
+    Returns:
+        MediaInfo: An object containing the extracted metadata.
+
+    Raises:
+        FileNotFoundError: If the specified media file does not exist.
+        ValueError: If the ffprobe output cannot be parsed as JSON.
+    """
+    if not validate_file(file_path):
         raise FileNotFoundError(f"Media file not found: {file_path}")
 
     ffmpeg = FFmpeg()
@@ -219,12 +283,12 @@ def get_MediaInfo(file_path: str) -> Dict[str, Any]:
             "-show_chapters",
             "-show_programs",
             "-print_format", "json",
-            str(file_path)
+            file_path
         ]
     )
 
     try:
-        return MediaProbe.process_media_info(json.loads(result.stdout))
+        return MediaInfo(json.loads(result.stdout))
     except json.JSONDecodeError as e:
         raise ValueError("Failed to parse ffprobe output") from e
 

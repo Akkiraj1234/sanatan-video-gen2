@@ -1,10 +1,10 @@
 [title: demo1]
-video = meida/video/video1
-video = media/video/video2
-audio = media/audio/audio1
-text1 = this is demo text 
-text2 = this is demo text2
-text3 = this is demo text3 
+video = /home/akkiraj/Desktop/sanatan-video-gen2/media/video/video1.mp4
+video = /home/akkiraj/Desktop/sanatan-video-gen2/media/video/video3.mp4
+audio = /home/akkiraj/Desktop/sanatan-video-gen2/media/audio/video3.mp4
+text1 = यह डेमो टेक्स्ट है
+text2 = यह डेमो टेक्स्ट2 है
+text3 = यह डेमो टेक्स्ट3 है
 countdown = 3
 size = 720x1080
 frame = 30
@@ -12,48 +12,25 @@ file_type = mp4
 template = demo_template.temp1
 
 [title: demo2]
-video = meida/video/video1
-video = media/video/video2
-audio = media/audio/audio1
-text1 = this is demo text 
-text2 = this is demo text2
-text3 = this is demo text3 
+video = /home/akkiraj/Desktop/sanatan-video-gen2/media/video/video1.mp4
+video = /home/akkiraj/Desktop/sanatan-video-gen2/media/video/video3.mp4
+audio = /home/akkiraj/Desktop/sanatan-video-gen2/media/video/video3.mp4
+text1 = यह डेमो टेक्स्ट है
+text2 = यह डेमो टेक्स्ट2 है
+text3 = यह डेमो टेक्स्ट3 है
 size = 720x1080
 frame = 30
 file_type = mp4
 template = demo_template.temp2
 
 [title: hanumanji]
-image = media/image/shrihanuman_h_1.jpg
-image = media/image/shrihanuman_h_2.jpg
-image = media/image/shrihanuman_h_3.jpg
-text1 = ["this is first demo text", "this is 2nd demo text", "this is 3rd demo text"]
-text2 = ["this is demo text", "this is again a demo text2"]
-text3 = ["this is demo txt"]
+image = /home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_h_1.jpg
+image = /home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_h_2.jpg
+image = /home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_h_3.jpg
+text1 = ["यह पहला डेमो टेक्स्ट है", "यह दूसरा डेमो टेक्स्ट है", "यह तीसरा डेमो टेक्स्ट है"]
+text2 = ["यह डेमो टेक्स्ट है", "यह फिर से डेमो टेक्स्ट2 है"]
+text3 = ["यह डेमो टेक्स्ट है"]
 size = 1080x720
 frame = 30
 file_type = mp4
 template = demo_template.temp3
-
-
-# [title: hanumanji]
-# {clip}
-# image = media/image/shrihanuman_h_1.jpg
-# text = "this is first demo text"
-# text = "this is 2nd demo text"
-# text = "this is 3rd demo text"
-# effect = [fadein,zoomout,fadeout]
-# {clip2}
-# image = media/image/shrihanuman_h_2.jpg
-# text = "this is demo text"
-# text = "this is again a demo text"
-# effect = [fadein, zoomout, fadeout]
-# {clip}
-# image = media/image/shrihanuman_h_3.jpg
-# text = "this is demo txt"
-# effect = [fadein, zoomout, fadeout]
-# {output}
-# size = 1080x720
-# frame = 30
-# file_type = mp4
-

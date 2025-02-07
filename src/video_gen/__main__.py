@@ -1,7 +1,5 @@
-from video_gen.logger import change_to_debug
 from video_gen.parser import parse_file, print_tasks
-from video_gen.engine import generate_demo_video
-
+from video_gen.engion import gen_video
 from argparse import ArgumentParser, Namespace
 import sys
 
@@ -26,7 +24,16 @@ def parse_arguments() -> Namespace:
     )
     return parser.parse_args()
 
-
+def execute(file_path:str) -> None:
+    tasks = parse_file(file_path)
+    for task in tasks:
+        try:
+            print_tasks(task)
+            gen_video(task)
+        except Exception as e:
+            print("ERROR: coude'nt genrate video \n",e)
+            continue
+    
 def main():
     """
     Main entry point of the application. Parses arguments,
@@ -34,16 +41,34 @@ def main():
     """
     args = parse_arguments()
     # updating logging
-    change_to_debug(args.debug)
+    # change_to_debug(args.debug)
     
     # the main application entry
-    tasks = parse_file(args.file_path)
-    print_tasks(tasks)
-    generate_demo_video(tasks)
-    
+    execute(args.file_path)
     return 0
 
 
 
 if __name__ == "__main__":
     sys.exit(main())
+
+
+
+
+
+
+
+
+
+
+# check_file_path = "/home/akkiraj/Desktop/sanatan-video-gen2/test-ffmpeg-engion/video3.mp4"
+
+# media = Video(check_file_path)
+# print(media.summary)
+# # print(json.dumps(media.STREAMS,indent=4))
+
+# check_file_path = "/home/akkiraj/Desktop/sanatan-video-gen2/test-ffmpeg-engion/kanao1.png"
+
+# media = Video(check_file_path)
+# print(media.summary)
+# # print(json.dumps(media.STREAMS,indent=4))

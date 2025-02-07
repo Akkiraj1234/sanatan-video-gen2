@@ -34,12 +34,12 @@ def validate_executable(name: str, path: str):
         FileNotFoundError: If the executable is not found in the given path and is not in the system's PATH.
         PermissionError: If the given path exists but is not a valid file.
     """
-    if not path.exists():
-        if is_inpath(path.name):
+    if not os.path.exists(path):
+        if is_inpath(path):
             return 
         raise FileNotFoundError(f"{name} not found at: {path}")
 
-    if not path.is_file():
+    if not os.path.isfile(path):
         raise PermissionError(f"{name} path is not a file: {path}")
     
 def translate_text(text, target_language='en'):
@@ -52,3 +52,6 @@ def translate_text(text, target_language='en'):
 
 def generate_unique_path(temp_path:str, file_type:str) -> str:
     return(os.path.join(temp_path, f"{uuid.uuid4()}.{file_type}"))
+
+def validate_file(file_path:str) -> bool:
+    return os.path.exists(file_path)
