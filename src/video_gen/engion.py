@@ -93,7 +93,7 @@ def gen_video(task:list) :
             os.remove(str(path)) 
             
     print(final_clip)
-    video_ =concatenate_steam(
+    video_ = concatenate_steam(
         *final_clip,
         output_path = os.path.join(temp_folder,f'{file_name}.{file_type}'),
         transition_duration=1,

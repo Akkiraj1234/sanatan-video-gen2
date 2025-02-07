@@ -179,10 +179,14 @@ def concatenate_steam(
         xfade(nidx[0], f'vid{idx}', f'v{idx-1}', nidx[1])
         nidx = (f'v{idx-1}', nidx[1] + videos[idx].duration-transition_duration)
     
+    audio_concat = "".join([f"[{idx}:a]" for idx in range(len(videos))])
+    audio_filter = f"{audio_concat}concat=n={len(videos)}:v=0:a=1[a]"
+    filter_complex.append(audio_filter)
+    
     # final output
     filter_complex.append(f"[{nidx[0]}]format=yuv420p[final]")
     cmd.extend(['-filter_complex', '; '.join(filter_complex)])
-    cmd.extend(['-map', '[final]','-y', output_path])
+    cmd.extend(['-map', '[final]','-y','-map','[a]', output_path])
     
     ffmpeg.run('ffmpeg', cmd, False)
     return Video(output_path)
