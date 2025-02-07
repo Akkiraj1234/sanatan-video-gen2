@@ -2,6 +2,7 @@ from video_gen.audio_gen import Tts, get_timestamps
 from video_gen.subtitles_gen import generate_flow_image
 from video_gen.editor.edit import edit
 from video_gen.utility import generate_unique_path, os
+
 demo = [
     {
         'frame': 30,
@@ -20,6 +21,7 @@ demo = [
         'text': ['this is demo text2', 'this is demo text3']
     }
 ]
+
 font_path = "/home/akkiraj/Desktop/sanatan-video-gen2/media/font/Mangal Regular.ttf"
 temp_folder = "/home/akkiraj/Desktop/sanatan-video-gen2/media/temp"
 
@@ -34,6 +36,7 @@ def gen_video(task:list) :
     # video creation set up
     tts = Tts()
     editor = edit()
+    final_clip = []
     
     for clip_info in task[1:]:
         media = clip_info.get("video",None)
@@ -54,20 +57,31 @@ def gen_video(task:list) :
                 font_path = font_path,
                 output_folder = temp_folder
             )
-            
             video = editor.concatenate_by_image(
                 audio = audio,
                 timestamps = timestamps,
-                frame_paths = frame_paths,
+                images = frame_paths,
                 output_path = generate_unique_path(
                     temp_path=temp_folder,
                     file_type="mov"
                 )
             )
             os.remove(audio.file_path)
-            (os.remove(path.file_path) for path in frame_paths)
+            for path in frame_paths:
+                os.remove(str(path)) 
             subtitles_clip.append(video)
         
+        # concatenating those 2 or more videos
+        main_sub_video = editor.concatenate_by_video(
+            videos = subtitles_clip,
+            output_path = generate_unique_path(
+                    temp_path=temp_folder,
+                    file_type="mov"
+            )
+        )
+        
+        
+        _ = input("lets not be too fast")
         
         # print(audio.file_path)
         # print(timestamps)

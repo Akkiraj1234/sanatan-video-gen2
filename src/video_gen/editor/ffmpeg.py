@@ -7,7 +7,7 @@ import json
 ffmpeg_path = "/home/akkiraj/Desktop/sanatan-video-gen2/ffmpeg/ffmpeg"
 ffprobe_path = "/home/akkiraj/Desktop/sanatan-video-gen2/ffmpeg/ffprobe"
 terminal = False
-terminal_info = ['-hide_banner', '-loglevel error', '-progress pipe:1']
+terminal_info = ['-hide_banner'] #'-loglevel error' , '-progress pipe:1'
 
 
 class FFmpeg:
@@ -78,7 +78,7 @@ class FFmpeg:
         kwargs = {}
         
         if command_type == 'ffmpeg':
-            base_command = [str(self.ffmpeg_path)] + terminal_info
+            base_command = [str(self.ffmpeg_path)] #+ terminal_info
             
         elif command_type == 'ffprobe':
             base_command = [str(self.ffprobe_path)]
@@ -89,14 +89,14 @@ class FFmpeg:
         if self.no_terminal:
             if OS_NAME == 'Windows':
                 kwargs['creationflags'] = subprocess.CREATE_NO_WINDOW
-
+                
         try:
             result = subprocess.run(
                 base_command + args,# + terminal_info,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
-                check=check,
+                # check=check,
                 **kwargs
             )
             return result

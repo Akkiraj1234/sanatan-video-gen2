@@ -16,27 +16,32 @@ except (ModuleNotFoundError, ImportError):
 
 
 # main code
-def get_timestamps(text:str, audio:Audio):
+def get_timestamps(text: str, audio: Audio):
     """
     Generates timestamps for each word in the text and associates them with an audio file's duration.
     
     Args:
-    - text (str): The text to be timestamped.
-    - audio_path (str): The path to the audio file.
+        text (str): The text to be timestamped.
+        audio (Audio): An Audio object with a 'duration' attribute in seconds.
     
     Returns:
-    - list: A list of tuples containing the start and end timestamps in milliseconds for each word.
+        list: A list of tuples containing the start and end timestamps in milliseconds for each word.
     """
     if not isinstance(audio, Audio):
         raise ValueError("Argument 'audio' should be an instance of Audio")
     
     words = text.split()
-    word_duration = (audio.duration * 1000) / len(words)
+    if not words:
+        return []
+    
+    # Convert total duration from seconds to milliseconds
+    total_duration_ms = audio.duration * 1000
+    word_duration_ms = total_duration_ms / len(words)
     timestamps = []
     
     for idx, word in enumerate(words):
-        start_time = int(idx * word_duration * 1000)  
-        end_time = int((idx + 1) * word_duration * 1000)
+        start_time = int(idx * word_duration_ms)
+        end_time = int((idx + 1) * word_duration_ms)
         timestamps.append((start_time, end_time, word))
 
     return timestamps

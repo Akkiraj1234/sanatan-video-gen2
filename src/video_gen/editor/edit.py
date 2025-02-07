@@ -1,17 +1,133 @@
 from video_gen.editor.media import Video, Audio
 from video_gen.editor.ffmpeg import FFmpeg
-from typing import List, Dict, Literal
+from typing import List, Dict, Tuple, Literal, Optional
+import os
 ffmpeg = FFmpeg()
+temp_folder = "/home/akkiraj/Desktop/sanatan-video-gen2/media/temp"
+
 
 class edit:
     
     def __init__(self):
         pass
     
-    
-    def concatenate_by_image(self) -> Video:
+    def concatenate_by_image(
+        self,
+        audio: Audio,
+        timestamps: List[Tuple[float,float,str]],
+        images: List[Video],
+        output_path: str
+    ) -> Optional[Video]:
+        """
+        Generate video clip from images synchronized with audio using timestamps
+        Args:
+            audio: Audio object to use as soundtrack
+            timestamps: List of (start_ms, end_ms, text) for each image
+            images: List of Image objects in order
+            output_path: Output video path
+        """
+        if len(timestamps) != len(images):
+            print("Mismatch between timestamps and images count")
+            return None
         
-        pass
+        list_file = os.path.join(temp_folder,"concat.txt")
+        with open(list_file,"w",encoding="utf-8") as f:
+            for idx, ((start, end, _), image) in enumerate(zip(timestamps, images)):
+                duration = (end - start) / 1000  # Convert ms to seconds
+                f.write(f"file '{image.file_path}'\n")
+                f.write(f"duration {duration:.3f}\n")
+            
+            # Repeat last frame to match audio length
+            f.write(f"file '{images[-1].file_path}'\n")
+
+        # Build FFmpeg command matching old method's settings
+        cmd = [
+            "-f", "concat", "-safe", "0", "-i", str(list_file),
+            "-i", str(audio),
+            "-c:v", "qtrle",              # Use QuickTime Animation (RLE) codec
+            "-pix_fmt", "argb",           # Preserve alpha channel
+            "-c:a", "aac", "-strict", "experimental",  # Required for AAC in older FFmpeg
+            "-shortest", "-y", str(output_path)
+        ]
+
+        if not ffmpeg.run('ffmpeg', cmd):
+            return None
+        
+        os.remove(list_file)
+
+        return Video(output_path)
+    
+    import subprocess
+
+    def convert_video(self,input_video: Video, output_video: str) -> Video:
+        cmd = [ '-i', str(input_video) ]
+        
+        if output_video.endswith('.mp4'):
+            cmd.extend(['-c:v', 'libx264','-pix_fmt', 'yuv420p'])
+        elif output_video.endswith('.mov'):
+            cmd.extend(['-c:v', 'prores_ks','-pix_fmt', 'yuva420p'])
+        else:
+            raise ValueError("Output video must be either .mp4 or .mov")
+        
+        cmd.extend(['-c:a', 'aac', output_video])
+        ffmpeg.run("ffmpeg",cmd)
+        return Video(output_video)
+
+
+    def concatenate_by_video(
+        self,
+        videos: str,
+        audio: bool = True,
+        output_path = ''
+    ) -> Video:
+        # Ensure there are at least two videos to concatenate
+        if len(videos) <= 1:
+            return self.convert_video(videos[0],output_path)
+        
+        cmd = []
+        for video in videos:
+            cmd.extend(['-i', str(video)])
+        
+        # Prepare the filter_complex argument
+        filter_complex = []
+        for idx in range(len(videos)):
+            filter_complex.append(f"[{idx}:v][{idx}:a]")
+        
+        
+        filter_complex.append(f"concat=n={len(videos)}:v=1:a=1[v][a]")
+        cmd.extend(['-filter_complex', ' '.join(filter_complex)])
+        cmd.extend(['-map', '[v]', '-map', '[a]', output_path])
+        ffmpeg.run('ffmpeg',cmd)
+        
+        return Video(output_path)
+
+    def overlay_video(
+        self, 
+        base_video:Video,
+        overlay_video:Video,
+        output_path:str,
+    ) -> Video:
+        cmd = []
+        cmd.extend(
+            ['-i',str(base_video), '-i', str(overlay_video)]
+        )
+        cmd.extend(
+            
+        )
+        
+
+    
+    
+    
+#ffmpeg -i start.mkv -i body.mkv -i rear.mkv -filter_complex \
+#"[0:v] [0:a] [1:v] [1:a] [2:v] [2:a]
+#concat=n=3:v=1:a=1 [v] [a]" \
+#-map "[v]" -map "[a]" output.mkv
+    
+        
+        
+
+
     
     
 
