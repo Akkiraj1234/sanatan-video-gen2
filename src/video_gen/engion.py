@@ -1,6 +1,6 @@
 from video_gen.audio_gen import Tts, get_timestamps
 from video_gen.subtitles_gen import generate_flow_image
-from video_gen.editor.edit import edit
+from video_gen.editor.edit import edit, concatenate_steam
 from video_gen.utility import generate_unique_path, os
 
 demo = [
@@ -79,19 +79,26 @@ def gen_video(task:list) :
                     file_type="mov"
             )
         )
-        
-        
-        _ = input("lets not be too fast")
-        
-        # print(audio.file_path)
-        # print(timestamps)
-        # for path in frame_paths:
-        #     print(path) 
-        # _ = input("here is till test if works or not")
+        final_video = editor.overlay_video_image(
+            base_video = media,
+            overlay_video = main_sub_video,
+            output_path = generate_unique_path(
+                    temp_path=temp_folder,
+                    file_type="mp4"
+            )
+        ) 
+        final_clip.append(final_video)
+        os.remove(str(main_sub_video))
+        for path in subtitles_clip:
+            os.remove(str(path)) 
             
-    
-    
-    
-
-
-
+    print(final_clip)
+    video_ =concatenate_steam(
+        *final_clip,
+        output_path = os.path.join(temp_folder,f'{file_name}.{file_type}'),
+        transition_duration=1,
+        transition_effect="smoothleft"
+    )
+    for path in final_clip:
+        os.remove(str(path)) 
+    print("video Created: ",str(video_))

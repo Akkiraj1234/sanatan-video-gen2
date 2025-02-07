@@ -96,39 +96,32 @@ class edit:
         
         filter_complex.append(f"concat=n={len(videos)}:v=1:a=1[v][a]")
         cmd.extend(['-filter_complex', ' '.join(filter_complex)])
-        cmd.extend(['-map', '[v]', '-map', '[a]', output_path])
+        cmd.extend(['-map', '[v]', '-map', '[a]','-c:v','prores_ks',output_path])
         ffmpeg.run('ffmpeg',cmd)
         
         return Video(output_path)
 
-    def overlay_video(
-        self, 
-        base_video:Video,
-        overlay_video:Video,
-        output_path:str,
-    ) -> Video:
-        cmd = []
-        cmd.extend(
-            ['-i',str(base_video), '-i', str(overlay_video)]
+    def overlay_video_image(self, base_video: Video, overlay_video: Video, output_path: str) -> Video:
+        video_size = f"{overlay_video.width}x{overlay_video.height}"  # Corrected order (width x height)
+
+        cmd = [
+            '-i', str(base_video),   # Base video (background)
+            '-i', str(overlay_video) # Overlay video
+        ]
+
+        filter_complex = (
+            f"[0:v]scale={video_size},fps={overlay_video.fps},format=rgba[bg];"
+            f"[bg][1:v]overlay=0:0:format=auto[video]"
         )
-        cmd.extend(
-            
-        )
-        
 
-    
-    
-    
-#ffmpeg -i start.mkv -i body.mkv -i rear.mkv -filter_complex \
-#"[0:v] [0:a] [1:v] [1:a] [2:v] [2:a]
-#concat=n=3:v=1:a=1 [v] [a]" \
-#-map "[v]" -map "[a]" output.mkv
-    
-        
-        
-
-
-    
+        cmd.extend([
+            '-filter_complex', filter_complex,
+            '-map', '[video]', '-map', '1:a',  # Map video & audio
+            '-c:v', 'libx264', '-c:a', 'aac', '-strict', 'experimental',
+            '-shortest', '-y', str(output_path)  # Stop when shorter video ends
+        ])
+        ffmpeg.run('ffmpeg',cmd,True)
+        return Video(output_path)
     
 
 
@@ -149,13 +142,11 @@ VALID_TRANSITIONS = Literal[
     "revealleft", "revealright","revealup,"
 ]
 
- 
-
 def concatenate_steam(
     *videos: Video,
     output_path: str,
     transition_effect:VALID_TRANSITIONS|None = None,
-    transition_duration: int = 2
+    transition_duration: int = 1
 ) -> Video:
     """
     Concatenates video
@@ -165,7 +156,7 @@ def concatenate_steam(
     frame_rate = 24
     
     for video in videos:
-        cmd.extend(['-i', str(video.file_path)])
+        cmd.extend(['-i', str(video)])
     
     # Apply scale filter so no error raise
     filter_complex = []
@@ -175,26 +166,24 @@ def concatenate_steam(
     
     # Generate xfade transitions method
     xfade = lambda id1,id2,out,offset: filter_complex.append(
-         f"[{id1}][{id2}]xfade=transition={transition_effect}:"
-        +f"duration={transition_duration}:offset={offset}[{out}]"
+        (f"[{id1}][{id2}]xfade=transition={transition_effect}:"
+         f"duration={transition_duration}:offset={offset}[{out}]")
     )
     # 1. creating first videos
-    nidx = ('v0',videos[0].properties['duration']-transition_duration)
+    nidx = ('v0',videos[0].duration-transition_duration)
     xfade('vid0','vid1',nidx[0],nidx[1])
-    nidx = (nidx[0], nidx[1] + videos[1].properties['duration']-transition_duration)
+    nidx = (nidx[0], nidx[1] + videos[1].duration-transition_duration)
     
     # 2. creating remain videos
     for idx in range(2,len(videos)):
         xfade(nidx[0], f'vid{idx}', f'v{idx-1}', nidx[1])
-        nidx = (f'v{idx-1}', nidx[1] + videos[idx].properties['duration']-transition_duration)
+        nidx = (f'v{idx-1}', nidx[1] + videos[idx].duration-transition_duration)
     
     # final output
     filter_complex.append(f"[{nidx[0]}]format=yuv420p[final]")
-    cmd.extend(['-filter_complex', '"' + '; '.join(filter_complex) + '"'])
-    cmd.extend(['-map', '[final]', output_path])
+    cmd.extend(['-filter_complex', '; '.join(filter_complex)])
+    cmd.extend(['-map', '[final]','-y', output_path])
     
-    print(' '.join(cmd))
     ffmpeg.run('ffmpeg', cmd, False)
     return Video(output_path)
-
 

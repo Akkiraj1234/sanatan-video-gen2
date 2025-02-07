@@ -42,7 +42,6 @@ def main():
     args = parse_arguments()
     # updating logging
     # change_to_debug(args.debug)
-    
     # the main application entry
     execute(args.file_path)
     return 0

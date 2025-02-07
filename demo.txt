@@ -24,9 +24,9 @@ file_type = mp4
 template = demo_template.temp2
 
 [title: hanumanji]
-video = /home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_h_1.jpg
-video = /home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_h_2.jpg
-video = /home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_h_3.jpg
+video = /home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_v_1.jpg
+video = /home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_v_2.jpg
+video = /home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_v_3.jpg
 text1 = ["यह पहला डेमो टेक्स्ट है", "यह दूसरा डेमो टेक्स्ट है", "यह तीसरा डेमो टेक्स्ट है"]
 text2 = ["यह डेमो टेक्स्ट है", "यह फिर से डेमो टेक्स्ट2 है"]
 text3 = ["यह डेमो टेक्स्ट है"]
