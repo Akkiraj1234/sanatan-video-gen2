@@ -45,28 +45,5 @@ def main():
     execute(args.file_path)
     return 0
 
-
-
 if __name__ == "__main__":
     sys.exit(main())
-
-
-
-
-
-
-
-
-
-
-# check_file_path = "/home/akkiraj/Desktop/sanatan-video-gen2/test-ffmpeg-engion/video3.mp4"
-
-# media = Video(check_file_path)
-# print(media.summary)
-# # print(json.dumps(media.STREAMS,indent=4))
-
-# check_file_path = "/home/akkiraj/Desktop/sanatan-video-gen2/test-ffmpeg-engion/kanao1.png"
-
-# media = Video(check_file_path)
-# print(media.summary)
-# # print(json.dumps(media.STREAMS,indent=4))

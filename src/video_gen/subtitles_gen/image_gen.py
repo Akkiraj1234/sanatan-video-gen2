@@ -1,13 +1,14 @@
 from typing import List, Tuple, Dict, Optional
 
-from video_gen.utility import UserDict, Path, clean_files
+from video_gen.utility import UserDict, Path, clean_files, DIR
 from video_gen.editor.media import Video, Audio
 from video_gen.editor.edit import edit
 from PIL import Image, ImageFont, ImageDraw
 import os
 
 class assets:
-    temp_path = "/home/akkiraj/Desktop/sanatan-video-gen2/media/temp"
+    temp_path = os.path.join(DIR, "media", "temp")
+    font_path = os.path.join(DIR, "media","font","Mangal Regular.ttf")
 
 
 

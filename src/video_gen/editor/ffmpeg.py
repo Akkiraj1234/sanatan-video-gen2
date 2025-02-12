@@ -1,11 +1,11 @@
-from video_gen.utility import validate_executable, OS_NAME, validate_file
+from video_gen.utility import validate_executable, OS_NAME, validate_file, DIR, os
 from typing import Dict, Any, List
 import subprocess
 import json
 
 # Default data to use for rn
-ffmpeg_path = "/home/akkiraj/Desktop/sanatan-video-gen2/ffmpeg/ffmpeg"
-ffprobe_path = "/home/akkiraj/Desktop/sanatan-video-gen2/ffmpeg/ffprobe"
+ffmpeg_path = os.path.join(DIR, "ffmpeg","ffmpeg")
+ffprobe_path = os.path.join(DIR, "ffmpeg","ffprobe")
 terminal = False
 terminal_info = ['-hide_banner'] #'-loglevel error' , '-progress pipe:1'
 
@@ -291,26 +291,3 @@ def get_MediaInfo(file_path: str) -> MediaInfo:
         return MediaInfo(json.loads(result.stdout))
     except json.JSONDecodeError as e:
         raise ValueError("Failed to parse ffprobe output") from e
-
-
-# def convert_to_wave(input_audio):
-#     """
-#     Converts any audio file to WAV format.
-
-#     :param input_audio: Path to the input audio file (e.g., MP3, WebM, OGG, etc.).
-#     :param output_wav: Path where the output WAV file should be saved.
-#     """
-#     # FFmpeg command to convert audio to WAV format
-#     wave_path = "".join(input_audio.split('.')[:-1])+".wav"
-#     command = [
-#         'ffmpeg',
-#         '-i', input_audio,  # Input audio file
-#         '-acodec', 'pcm_s16le',  # Use PCM codec for WAV format (signed 16-bit little-endian)
-#         '-ar', '44100',  # Audio sample rate (44.1kHz is standard for most audio)
-#         '-ac', '2',  # Number of audio channels (2 = stereo)
-#         '-y',  # Overwrite output file without asking
-#         wave_path  # Output WAV file path
-#     ]
-#     subprocess.run(command)
-#     os.remove(input_audio)
-#     return wave_path

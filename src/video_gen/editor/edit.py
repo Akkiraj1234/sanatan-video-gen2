@@ -1,9 +1,13 @@
 from video_gen.editor.media import Video, Audio
 from video_gen.editor.ffmpeg import FFmpeg
 from typing import List, Dict, Tuple, Literal, Optional
+from video_gen.utility import DIR
 import os
 ffmpeg = FFmpeg()
-temp_folder = "/home/akkiraj/Desktop/sanatan-video-gen2/media/temp"
+
+class assets:
+    temp_path = os.path.join(DIR, "media", "temp")
+    font_path = os.path.join(DIR, "media","font","Mangal Regular.ttf")
 
 
 class edit:
@@ -29,7 +33,7 @@ class edit:
             print("Mismatch between timestamps and images count")
             return None
         
-        list_file = os.path.join(temp_folder,"concat.txt")
+        list_file = os.path.join(assets.temp_path,"concat.txt")
         with open(list_file,"w",encoding="utf-8") as f:
             for idx, ((start, end, _), image) in enumerate(zip(timestamps, images)):
                 duration = (end - start) / 1000  # Convert ms to seconds

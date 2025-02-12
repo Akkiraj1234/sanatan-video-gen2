@@ -1,7 +1,11 @@
 from video_gen.editor.media import Audio
-from video_gen.utility import translate_text, generate_unique_path
+from video_gen.utility import translate_text, generate_unique_path, os, DIR
 from typing import List, Tuple
-temp_path = "/home/akkiraj/Desktop/sanatan-video-gen2/media/temp"
+
+
+class assets:
+    temp_path = os.path.join(DIR, "media", "temp")
+    font_path = os.path.join(DIR, "media","font","Mangal Regular.ttf")
 
 # importing other modules
 try:
@@ -123,7 +127,7 @@ class Tts:
     
     def create(self, script, lang = "hi") -> Audio:
         translated_text = script
-        output_path = generate_unique_path(temp_path,"mp3") # temp path from settings
+        output_path = generate_unique_path(assets.temp_path,"mp3") # temp path from settings
         return self.tts(
             script = translated_text,
             output_path = output_path,

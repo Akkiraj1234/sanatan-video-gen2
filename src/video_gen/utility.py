@@ -10,6 +10,8 @@ OS_NAME = os.name
 class Media:
     pass
 
+DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 def is_inpath(executable: str) -> bool:
     """
     Check if the given executable is in the directories listed 

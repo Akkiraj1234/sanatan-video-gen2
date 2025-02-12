@@ -1,24 +1,6 @@
 from video_gen.editor.media import Video
-from colorama import Fore, Style, init
+from colorama import Fore, Style
 import re
-
-init()
-
-
-def process_input_file(file_path: str) -> None:
-    """
-    Reads and processes the content of the specified input file.
-    """
-    try:
-        with open(file_path, 'r') as file:
-            content = file.read()
-            print("Successfully read the file content.")
-            
-    except FileNotFoundError:
-        print("Error: The file '%s' was not found.", file_path)
-        
-    except Exception as e:
-        print("An unexpected error occurred while reading the file: %s", e)
 
 def parse_file(file_path):
     """
@@ -96,10 +78,6 @@ def parse_file(file_path):
     
     return tasks_list
 
-def reset_color():
-    """Reset color formatting manually."""
-    return Style.RESET_ALL
-
 def print_task(tasks, detail: int = 2):
     """Print tasks in a visual format with colored output."""
     metadata = tasks[0]
@@ -145,7 +123,6 @@ def print_task(tasks, detail: int = 2):
     # Audio section
     print(f"{Style.RESET_ALL}├─ {AUDIO}Audio Files: {VALUE}{metadata.get('bg_audio', 'None')}{Style.RESET_ALL}")
     print(f"{Style.RESET_ALL}╰─{'─' * 40}{Style.RESET_ALL}\n")
-
 
 def demo_json_data():
     return [
