@@ -1,6 +1,17 @@
-from video_gen.editor.media import Video
+from typing import List, Tuple, Dict, Optional
+
+from video_gen.utility import UserDict, Path, clean_files
+from video_gen.editor.media import Video, Audio
+from video_gen.editor.edit import edit
 from PIL import Image, ImageFont, ImageDraw
 import os
+
+class assets:
+    temp_path = "/home/akkiraj/Desktop/sanatan-video-gen2/media/temp"
+
+
+
+
 
 def create_image_with_word(
     word: str,
@@ -195,3 +206,51 @@ def generate_flow_image(
         current_y += char_h
 
     return frame_paths
+
+
+def gen_trans_sub(
+    text: str,
+    audio: Audio,
+    timestamps: List[Tuple[int, int, str]],
+    file_info: UserDict,
+    output_file: Path|str
+) -> Video:
+    """
+    Generate a transparent subtitle video.
+
+    Args:
+        text (str): Subtitle text.
+        audio (Audio): Audio file associated with the subtitles.
+        timestamps (List[Tuple[int, int, str]]): List of (start, end, text) tuples.
+        file_info (UserDict): Dictionary containing font settings.
+        output_file (Optional[Path]): Path to save the output video (defaults to None).
+
+    Returns:
+        Video: The generated video with transparent subtitles.
+    
+    Note:
+        for rn just provide .mov file path else there will be error in video gen
+    """
+    frame_paths = []
+    
+    try:
+        frame_paths = generate_flow_image(
+            text = text,
+            font_size = file_info.font_size,
+            font_path = file_info.font_name,
+            output_folder = assets.temp_path
+        )
+        video = edit.concatenate_by_image(
+            audio = audio,
+            timestamps = timestamps,
+            images = frame_paths,
+            output_path = output_file
+        )
+    
+    except Exception as e:
+        raise 
+    
+    finally:
+        clean_files(frame_paths)
+                
+    return video

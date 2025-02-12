@@ -7,12 +7,11 @@ temp_folder = "/home/akkiraj/Desktop/sanatan-video-gen2/media/temp"
 
 
 class edit:
-    
     def __init__(self):
         pass
     
+    @staticmethod
     def concatenate_by_image(
-        self,
         audio: Audio,
         timestamps: List[Tuple[float,float,str]],
         images: List[Video],
@@ -52,14 +51,11 @@ class edit:
 
         if not ffmpeg.run('ffmpeg', cmd):
             return None
-        
         os.remove(list_file)
-
         return Video(output_path)
-    
-    import subprocess
 
-    def convert_video(self,input_video: Video, output_video: str) -> Video:
+    @staticmethod
+    def convert_video(input_video: Video, output_video: str) -> Video:
         cmd = [ '-i', str(input_video) ]
         
         if output_video.endswith('.mp4'):
@@ -73,16 +69,15 @@ class edit:
         ffmpeg.run("ffmpeg",cmd)
         return Video(output_video)
 
-
+    @staticmethod
     def concatenate_by_video(
-        self,
         videos: str,
         audio: bool = True,
         output_path = ''
     ) -> Video:
         # Ensure there are at least two videos to concatenate
         if len(videos) <= 1:
-            return self.convert_video(videos[0],output_path)
+            return edit.convert_video(videos[0],output_path)
         
         cmd = []
         for video in videos:
@@ -100,8 +95,9 @@ class edit:
         ffmpeg.run('ffmpeg',cmd)
         
         return Video(output_path)
-
-    def overlay_video_image(self, base_video: Video, overlay_video: Video, output_path: str) -> Video:
+    
+    @staticmethod
+    def overlay_video_image(base_video: Video, overlay_video: Video, output_path: str) -> Video:
         video_size = f"{overlay_video.width}x{overlay_video.height}"  # Corrected order (width x height)
 
         cmd = [
@@ -122,6 +118,19 @@ class edit:
         ])
         ffmpeg.run('ffmpeg',cmd,True)
         return Video(output_path)
+    
+def remove_green_screen_and_save_as_mov(*file_paths):
+    for file in file_paths:
+        path,_ = file.rsplit('.',1)
+        cmd = [
+            '-i', file,
+            '-filter_complex',
+            '[0:v]colorkey=0x00ff00:0.4:0.2[ckout]',
+            '-map', '[ckout]',
+            '-c:v', 'prores_ks',
+            '-y', f'{path}.mov'
+        ]
+        ffmpeg.run('ffmpeg', cmd)
     
 
 
@@ -191,3 +200,18 @@ def concatenate_steam(
     ffmpeg.run('ffmpeg', cmd, False)
     return Video(output_path)
 
+
+
+class effect:
+    pass
+
+
+
+class CustomVideoCreator:
+    
+    def __init__(self):
+        pass
+    
+    def countdown(self):
+        pass
+    

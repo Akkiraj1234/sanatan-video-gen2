@@ -1,8 +1,7 @@
-from video_gen.parser import parse_file, print_tasks
-from video_gen.engion import gen_video
+from video_gen.parser import parse_file, demo_json_data
+from video_gen.engion import Engine
 from argparse import ArgumentParser, Namespace
 import sys
-
 
 def parse_arguments() -> Namespace:
     """
@@ -26,14 +25,14 @@ def parse_arguments() -> Namespace:
 
 def execute(file_path:str) -> None:
     tasks = parse_file(file_path)
-    for task in tasks:
-        try:
-            print_tasks(task)
-            gen_video(task)
-        except Exception as e:
-            print("ERROR: coude'nt genrate video \n",e)
-            continue
+    tasks = demo_json_data()
+    engion = Engine()
     
+    for task in tasks:
+        engion.create(task)
+        
+    engion.summary()
+
 def main():
     """
     Main entry point of the application. Parses arguments,

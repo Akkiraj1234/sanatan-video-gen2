@@ -1,6 +1,6 @@
 from video_gen.editor.media import Audio
 from video_gen.utility import translate_text, generate_unique_path
-from typing import List
+from typing import List, Tuple
 temp_path = "/home/akkiraj/Desktop/sanatan-video-gen2/media/temp"
 
 # importing other modules
@@ -16,7 +16,7 @@ except (ModuleNotFoundError, ImportError):
 
 
 # main code
-def get_timestamps(text: str, audio: Audio):
+def get_timestamps(text: str, audio: Audio) -> List[Tuple[int, int, str]]:
     """
     Generates timestamps for each word in the text and associates them with an audio file's duration.
     
@@ -115,7 +115,7 @@ def get_tts(name:str) -> tuple[callable,bool]:
 class Tts:
     def __init__(self, tts_use:str = None):
         if tts_use is None:
-            tts_use = "elevenlabs" # will use settings
+            tts_use = "gtts" # will use settings
         
         self.tts, works = get_tts(tts_use)
         if not works:

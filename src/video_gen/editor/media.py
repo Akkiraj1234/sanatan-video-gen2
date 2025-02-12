@@ -1,9 +1,10 @@
 from __future__ import annotations
 from typing import Dict
 from video_gen.editor.ffmpeg import get_MediaInfo
+from video_gen.utility import Media
 
 
-class Video:
+class Video(Media):
     """
     A class to represent a video file and its metadata.
 
@@ -153,7 +154,7 @@ class Video:
         return self.duration_ts
 
 
-class Audio:
+class Audio(Media):
     """
     A class to represent an audio file and its metadata.
 

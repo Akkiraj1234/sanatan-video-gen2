@@ -1,9 +1,14 @@
+from typing import Union, Iterable
+from collections import UserDict
 from googletrans import Translator
 from pathlib import Path
 import os
 import uuid
 
 OS_NAME = os.name
+
+class Media:
+    pass
 
 def is_inpath(executable: str) -> bool:
     """
@@ -55,3 +60,53 @@ def generate_unique_path(temp_path:str, file_type:str) -> str:
 
 def validate_file(file_path:str) -> bool:
     return os.path.exists(file_path)
+
+
+class AttrDict(UserDict):
+    def __getattr__(self, key):
+        if key in self.data:  # Directly check self.data to avoid recursion
+            return self.data[key]
+        raise AttributeError(f"Attribute {key} not found")
+    
+    def __setattr__(self, key, value):
+        if key == "data":  # Allow setting 'data' in UserDict
+            super().__setattr__(key, value)
+        else:
+            self.data[key] = value  # Store in self.data to prevent recursion
+
+    def __delattr__(self, key):
+        if key in self.data:
+            del self.data[key]
+        else:
+            raise AttributeError(f"Attribute {key} not found")
+        
+
+def clean_files(*paths: Union[str, Path, Iterable[Union[str, Path]]]):
+    """
+    Deletes the given file(s) safely without raising errors.
+
+    Args:
+        paths (Union[str, Path, Iterable[Union[str, Path]]]): 
+            Single or multiple file paths to delete.
+
+    Prints:
+        - A warning message if a file could not be deleted.
+        - Nothing if deletion is successful.
+    """
+    for path in paths:
+        if isinstance(path, Media):
+            path = str(path)
+            
+        if isinstance(path, (list, tuple, set)):  # Handle iterable of paths
+            clean_files(*path)
+            continue
+        
+        try:
+            path = Path(path)  # Convert to Path object
+            if path.exists():
+                path.unlink()
+                print(f"Deleted: {path}")
+            else:
+                print(f"Warning: File not found: {path}")
+        except Exception as e:
+            print(f"Error deleting {path}: {e}")

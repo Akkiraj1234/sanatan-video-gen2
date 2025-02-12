@@ -1,5 +1,8 @@
 from video_gen.editor.media import Video
+from colorama import Fore, Style, init
 import re
+
+init()
 
 
 def process_input_file(file_path: str) -> None:
@@ -16,8 +19,6 @@ def process_input_file(file_path: str) -> None:
         
     except Exception as e:
         print("An unexpected error occurred while reading the file: %s", e)
-
-
 
 def parse_file(file_path):
     """
@@ -95,29 +96,108 @@ def parse_file(file_path):
     
     return tasks_list
 
-def print_tasks(tasks):
-    """Print tasks in a visual format from the list of tasks."""
+def reset_color():
+    """Reset color formatting manually."""
+    return Style.RESET_ALL
+
+def print_task(tasks, detail: int = 2):
+    """Print tasks in a visual format with colored output."""
     metadata = tasks[0]
     media_items = tasks[1:]
     
-    print(f"▌ Title: {metadata['file_name']}")
-    print(f"├─ Template: {metadata['template']}")
-    print(f"├─ Size: {metadata['size'][0]}x{metadata['size'][1]}")
-    print(f"├─ Frame Rate: {metadata['frame']}")
-    print(f"├─ File Type: {metadata['file_type']}")
-    print("├─ Media Items:")
-    for i, item in enumerate(media_items, 1):
-        # Decide the media type by checking for the key in the dictionary
-        if 'video' in item:
-            media_type = 'video'
-            icon = '🎥'
-        else:
-            media_type = 'image'
-            icon = '🖼'
-        texts = ', '.join(item.get('text', []))
-        # Assuming the Video (or Image) object has a .path attribute
-        print(f"│  ╰─ {icon} Pair {i}: {item[media_type].file_path}")
-        print(f"│     ╰─ Texts: {texts or 'None'}")
-    print(f"├─ Audio Files: {metadata['bg_audio'] or 'None'}")
-    print("╰─" + "─" * 40 + "\n")
+    # Color configuration
+    TITLE = Fore.LIGHTCYAN_EX
+    META = Fore.GREEN
+    MEDIA_HEADER = Fore.MAGENTA
+    PAIR = Fore.BLUE
+    TEXT = Fore.MAGENTA
+    VALUE = Fore.CYAN
+    AUDIO = Fore.BLUE
+    ICON_VIDEO = Fore.RED
+    ICON_IMAGE = Fore.GREEN
 
+    # Metadata section
+    print(f"{Style.RESET_ALL}▌ {TITLE}Title: {VALUE}{metadata['title']}{Style.RESET_ALL}")
+    print(f"{Style.RESET_ALL}├─ {META}Size: {VALUE}{metadata['width']}x{metadata['height']}{Style.RESET_ALL}")
+    print(f"{Style.RESET_ALL}├─ {META}Frame Rate: {VALUE}{metadata['frame']}{Style.RESET_ALL}")
+    print(f"{Style.RESET_ALL}├─ {META}File Type: {VALUE}{metadata['file_type']}{Style.RESET_ALL}")
+    
+    if detail < 1:
+        return
+
+    # Media items section
+    print(f"{Style.RESET_ALL}├─ {MEDIA_HEADER}Media Items:{Style.RESET_ALL}")
+    for i, item in enumerate(media_items, 1):
+        media_type = 'video' if 'video' in item else 'image'
+        icon = '🎥' if media_type == 'video' else '🖼'
+        icon_color = ICON_VIDEO if media_type == 'video' else ICON_IMAGE
+        
+        print(f"{Style.RESET_ALL}│  ╰─ {icon_color}{icon}{Style.RESET_ALL} {PAIR}Pair {i}: {VALUE}{item[media_type]}{Style.RESET_ALL}")
+        texts = ', '.join(item.get('text', []))
+        print(f"{Style.RESET_ALL}│     ╰─ {TEXT}Texts: {VALUE}{texts or 'None'}{Style.RESET_ALL}")
+        
+        if detail >= 2:
+            transition = item.get('transition', "no transition")
+            effect = ', '.join(item['effect']) if item.get('effect') else 'no effect'
+            print(f"{Style.RESET_ALL}│     ╰─ {TEXT}Transition: {VALUE}{transition}{Style.RESET_ALL}")
+            print(f"{Style.RESET_ALL}│     ╰─ {TEXT}Effect: {VALUE}{effect}{Style.RESET_ALL}")
+
+    # Audio section
+    print(f"{Style.RESET_ALL}├─ {AUDIO}Audio Files: {VALUE}{metadata.get('bg_audio', 'None')}{Style.RESET_ALL}")
+    print(f"{Style.RESET_ALL}╰─{'─' * 40}{Style.RESET_ALL}\n")
+
+
+def demo_json_data():
+    return [
+        [
+            {
+                "title":"hanumanji",
+                "width":1080,
+                "height":720,
+                "frame":30,
+                "file_type":"mp4"
+            },
+            {
+                "video":"/home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_v_1.jpg",
+                "text":["श्री हनुमान जी की कृपा से असंभव भी संभव है।", "संकट मोचक हनुमान, भक्तों के कष्ट हरने वाले।", "राम नाम की शक्ति से जीवन में हर बाधा दूर होती है।"],
+                "transition": "fade",
+                "effect":["scale-down", "flower-rain"]
+            },
+            {
+                "video":"/home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_v_2.jpg",
+                "text": ["जय श्री राम!", "श्री हनुमान जी की असीम कृपा सदैव बनी रहे।"],
+                "transition": "fade",
+                "effect":["scale-down", "flower-rain"]
+            },
+            {
+                "video":"/home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_v_3.jpg",
+                "text":["हनुमान जी की भक्ति से अजेय बनो।"],
+                "transition": "dissolve",
+                "effect":["scale-down", "white-flower-rain"]
+            },
+            {
+                "video":"/home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_v_3.jpg",
+                "text":["इस तरह के वीडियो के लिए सनातन का पालन करें", "देखने के लिए धन्यवाद"],
+                "effect":["fade", "white-flower-rain"]
+            }
+        ],
+        [
+            {
+                "title":"radhaji",
+                "width":720,
+                "height":1080,
+                "frame":60,
+                "file_type":"mp4"
+            },
+            {
+                "video":"/home/akkiraj/Desktop/sanatan-video-gen2/media/video/video2.mp4",
+                "text":["श्री हनुमान जी की कृपा से असंभव भी संभव है?", ":countdown:3:"],
+                "transition": "fade"
+            },
+            {
+                "video":"/home/akkiraj/Desktop/sanatan-video-gen2/media/video/video1.mp4",
+                "text": ["श्री हनुमान जी की कृपा से असंभव भी संभव है।", "संकट मोचक हनुमान, भक्तों के कष्ट हरने वाले।", "राम नाम की शक्ति से जीवन में हर बाधा दूर होती है।"],
+                "transition": "fade"
+            },
+        ]
+    ]
