@@ -1,13 +1,9 @@
 from video_gen.editor.media import Video, Audio
 from video_gen.editor.ffmpeg import FFmpeg
 from typing import List, Dict, Tuple, Literal, Optional
-from video_gen.utility import DIR
+from video_gen.utility import assets
 import os
 ffmpeg = FFmpeg()
-
-class assets:
-    temp_path = os.path.join(DIR, "media", "temp")
-    font_path = os.path.join(DIR, "media","font","Mangal Regular.ttf")
 
 
 class edit:

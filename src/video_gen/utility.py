@@ -11,6 +11,11 @@ class Media:
     pass
 
 DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+class assets:
+    temp_path = os.path.join(DIR, "assets", "temp")
+    font_path = os.path.join(DIR, "assets","font","Mangal Regular.ttf")
+    ffmpeg  = os.path.join(DIR, "ffmpeg","ffmpeg")
+    ffprobe = os.path.join(DIR, "ffmpeg","ffprobe")
 
 def is_inpath(executable: str) -> bool:
     """

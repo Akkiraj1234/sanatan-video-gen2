@@ -1,11 +1,6 @@
 from video_gen.editor.media import Audio
-from video_gen.utility import translate_text, generate_unique_path, os, DIR
+from video_gen.utility import generate_unique_path, assets
 from typing import List, Tuple
-
-
-class assets:
-    temp_path = os.path.join(DIR, "media", "temp")
-    font_path = os.path.join(DIR, "media","font","Mangal Regular.ttf")
 
 # importing other modules
 try:

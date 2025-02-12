@@ -2,14 +2,11 @@ from typing import List, Dict
 from video_gen.audio_gen import Tts, get_timestamps
 from video_gen.subtitles_gen import  gen_trans_sub
 from video_gen.editor.edit import edit, concatenate_steam
-from video_gen.utility import generate_unique_path, os, AttrDict, clean_files, DIR
+from video_gen.utility import generate_unique_path, os, AttrDict, clean_files, assets
 from video_gen.editor.media import Video, Audio
 from video_gen.parser import print_task
 import time
 
-class assets:
-    temp_path = os.path.join(DIR, "media", "temp")
-    font_path = os.path.join(DIR, "media","font","Mangal Regular.ttf")
 
 class Engine:
     """

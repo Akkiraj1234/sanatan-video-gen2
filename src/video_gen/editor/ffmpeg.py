@@ -1,11 +1,11 @@
-from video_gen.utility import validate_executable, OS_NAME, validate_file, DIR, os
+from video_gen.utility import validate_executable, OS_NAME, validate_file, assets
 from typing import Dict, Any, List
 import subprocess
 import json
 
 # Default data to use for rn
-ffmpeg_path = os.path.join(DIR, "ffmpeg","ffmpeg")
-ffprobe_path = os.path.join(DIR, "ffmpeg","ffprobe")
+ffmpeg_path = assets.ffmpeg
+ffprobe_path = assets.ffprobe
 terminal = False
 terminal_info = ['-hide_banner'] #'-loglevel error' , '-progress pipe:1'
 

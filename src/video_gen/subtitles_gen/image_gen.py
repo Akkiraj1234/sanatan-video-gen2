@@ -1,17 +1,10 @@
 from typing import List, Tuple, Dict, Optional
 
-from video_gen.utility import UserDict, Path, clean_files, DIR
+from video_gen.utility import UserDict, Path, clean_files, assets
 from video_gen.editor.media import Video, Audio
 from video_gen.editor.edit import edit
 from PIL import Image, ImageFont, ImageDraw
 import os
-
-class assets:
-    temp_path = os.path.join(DIR, "media", "temp")
-    font_path = os.path.join(DIR, "media","font","Mangal Regular.ttf")
-
-
-
 
 
 def create_image_with_word(
