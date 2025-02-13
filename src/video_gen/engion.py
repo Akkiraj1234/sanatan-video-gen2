@@ -1,10 +1,10 @@
 from typing import List, Dict
 from video_gen.audio_gen import Tts, get_timestamps
-from video_gen.subtitles_gen import  gen_trans_sub
-from video_gen.editor.edit import edit, concatenate_steam
-from video_gen.utility import generate_unique_path, os, AttrDict, clean_files, assets
 from video_gen.editor.media import Video, Audio
-from video_gen.parser import print_task
+from video_gen.editor.effect import effect_get
+from video_gen.editor.edit import edit
+from video_gen.subtitles_gen import  gen_trans_sub
+from video_gen.utility import generate_unique_path, os, AttrDict, clean_files, assets, print_task, copy_file
 import time
 
 
@@ -42,19 +42,6 @@ class Engine:
             'font_name': info.get('font', assets.font_path),
             'font_size': info.get('font_size', 50)
         })
-    
-    def _assets_work(self, media:str) -> Video:
-        path = generate_unique_path(
-            temp_path = assets.temp_path,
-            file_type=str(media).rsplit('.',1)[-1]
-        )
-        with open(str(media), 'rb') as src_file:
-            content = src_file.read()
-            with open(path, 'wb') as dest_file:
-                # Write the content to the new file
-                dest_file.write(content)
-
-        return Video(path)
 
     def _nano_clip_creation(self, text:str, file_info) -> Video:
         """
@@ -78,6 +65,80 @@ class Engine:
         clean_files((audio))
         return mov
     
+    def _assets_work(self, task:str, file_info, duration:int) -> Video:
+        """_summary_
+
+        Args:
+            task (str): _description_
+            file_info (_type_): _description_
+
+        Raises:
+            ValueError: _description_
+
+        Returns:
+            Video: _description_
+        """
+        try:
+            media = Video(task['video'])
+            video_effect = task['effect']
+        except KeyError as e:
+            raise ValueError('the format is not correct cloudnet find media and effect')
+        
+        video = media
+        for effect in video_effect:
+            effect = effect_get.get(effect)
+            video = effect(
+                input_path = video,
+                output_path = generate_unique_path(
+                    temp_path = assets.temp_path,
+                    file_type = "mp4"
+                ),
+                total_duration = duration
+            )
+
+        if effect == []:
+            effect_get.get('no_effect')(
+                input_path = str(media),
+                output_path = generate_unique_path(
+                    temp_path = assets.temp_path,
+                    file_type = "mp4"
+                )
+            )
+            
+        return video
+    
+    def _subtile_creation(self, task, file_info):
+        """_summary_
+
+        Args:
+            texts (_type_): _description_
+            file_info (_type_): _description_
+
+        Returns:
+            _type_: _description_
+        """
+        try:
+            texts = task['text']
+        except KeyError as e:
+            raise ValueError('the format is not correct cloudnet find text')
+        
+        # creating nano clips
+        nano_clips:List[Video] = []
+        for text in texts:
+            nano_clip = self._nano_clip_creation(text, file_info)
+            nano_clips.append(nano_clip)
+        
+        # creating the transparent clip
+        semi_clip = edit.concatenate_by_video(
+            videos = nano_clips,
+            output_path = generate_unique_path(
+                temp_path = assets.temp_path,
+                file_type="mov"
+            )
+        )
+        clean_files(nano_clips)
+        return semi_clip
+    
     def _clip_creation(self, task:Dict, file_info) -> List[Video]:
         """
         Handles the creation of nano clips with various video and compositing effects.
@@ -88,30 +149,10 @@ class Engine:
         Returns:
             List[Dict]: List of created clip metadata.
         """
-        try:
-            media = Video(task['video'])
-            texts = task['text']
-        except KeyError as e:
-            raise ValueError('the format is not correct cloudnet find media and text')
-        
-        # creating nano clips
-        nano_clips:List[Video] = []
-        for text in texts:
-            nano_clip = self._nano_clip_creation(text, file_info)
-            nano_clips.append(nano_clip)
-        
-        
         # adding all the effects in media as showed in pipeline
-        semi_media = self._assets_work(media)
+        semi_clip  = self._subtile_creation(task, file_info)
+        semi_media = self._assets_work(task, file_info, semi_clip.duration)
         
-        # creating the transparent clip
-        semi_clip = edit.concatenate_by_video(
-            videos = nano_clips,
-            output_path = generate_unique_path(
-                temp_path = assets.temp_path,
-                file_type="mov"
-            )
-        )
         # creating final video by merging them
         clip = edit.overlay_video_image(
             base_video = semi_media,
@@ -121,7 +162,6 @@ class Engine:
                 file_type = "mp4"
             )
         )
-        clean_files(nano_clips)
         clean_files(semi_clip)
         clean_files(semi_media)
         return clip
@@ -146,7 +186,7 @@ class Engine:
         Returns:
             Video: The processed video after applying final adjustments.
         """
-        return concatenate_steam(
+        return edit.concatenate_steam(
             *clips,
             output_path = os.path.join(assets.temp_path,f'{fine_info.title}.{fine_info.file_type}'),
             transition_duration=1,
@@ -209,6 +249,7 @@ class Engine:
             self.failed_tasks.append([task, str(e)])
             print(f"Error occurred while creating video: {e}")
             print("Please check the task details and try again.\n")
+            # raise
             
         finally:
             self.total += 1

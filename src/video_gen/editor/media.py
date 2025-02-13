@@ -122,6 +122,9 @@ class Video(Media):
         # Build the summary string line by line.
         summary_lines = [f"{key}: {value}" for key, value in details.items()]
         return "\n".join(summary_lines)
+    
+    def isimage(self):
+        return True
 
     def __repr__(self) -> str:
         """

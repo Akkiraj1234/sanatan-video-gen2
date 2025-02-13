@@ -6,7 +6,7 @@
 #       - font name
 
 #---------------nano-clips creation----------------
-# 1. video effects - [zoom, glow, movie-frame]                - video effect on video bg
+# 1. video effects - [zoom, glow, movie-frame]                - video effect on main video bg
 # 2. composting effects - [rose-rain, fire, fast-forward]     - clip effect - before text or
 #                                                               add it in main video
 # 3. sp_clips                                                 - this is spacial it will 

@@ -1,14 +1,29 @@
+from typing import List, Tuple, Literal, Optional
 from video_gen.editor.media import Video, Audio
-from video_gen.editor.ffmpeg import FFmpeg
-from typing import List, Dict, Tuple, Literal, Optional
+from video_gen.editor.ffmpeg import ffmpeg
 from video_gen.utility import assets
 import os
-ffmpeg = FFmpeg()
 
+
+
+VALID_TRANSITIONS = Literal[
+    "fade", "fadeblack", "fadewhite", "distance",
+    "wipeleft", "wiperight", "wipeup", "wipedown",
+    "slideleft", "slideright", "slideup", "slidedown",
+    "smoothleft", "smoothright", "smoothup", "smoothdown",
+    "circlecrop","rectcrop","circleclose", "circleopen",
+    "horzclose", "horzopen", "vertclose", "vertopen",
+    "diagbl", "diagbr", "diagtl", "diagtr", 
+    "hlslice", "hrslice", "vuslice", "vdslice",
+    "dissolve", "pixelize", "radial", "hblur",
+    "wipetl", "wipetr", "wipebl", "wipebr",
+    "fadegrays", "squeezev", "squeezeh", "zoomin",
+    "hlwind", "hrwind", "vuwind","vdwind",
+    "coverleft", "coverright", "coverup ","coverdown",
+    "revealleft", "revealright","revealup,"
+]
 
 class edit:
-    def __init__(self):
-        pass
     
     @staticmethod
     def concatenate_by_image(
@@ -55,7 +70,10 @@ class edit:
         return Video(output_path)
 
     @staticmethod
-    def convert_video(input_video: Video, output_video: str) -> Video:
+    def convert_video(
+        input_video: Video, 
+        output_video: str
+    ) -> Video:
         cmd = [ '-i', str(input_video) ]
         
         if output_video.endswith('.mp4'):
@@ -97,7 +115,11 @@ class edit:
         return Video(output_path)
     
     @staticmethod
-    def overlay_video_image(base_video: Video, overlay_video: Video, output_path: str) -> Video:
+    def overlay_video_image(
+        base_video: Video,
+        overlay_video: Video, 
+        output_path: str
+    ) -> Video:
         video_size = f"{overlay_video.width}x{overlay_video.height}"  # Corrected order (width x height)
 
         cmd = [
@@ -119,99 +141,54 @@ class edit:
         ffmpeg.run('ffmpeg',cmd,True)
         return Video(output_path)
     
-def remove_green_screen_and_save_as_mov(*file_paths):
-    for file in file_paths:
-        path,_ = file.rsplit('.',1)
-        cmd = [
-            '-i', file,
-            '-filter_complex',
-            '[0:v]colorkey=0x00ff00:0.4:0.2[ckout]',
-            '-map', '[ckout]',
-            '-c:v', 'prores_ks',
-            '-y', f'{path}.mov'
-        ]
-        ffmpeg.run('ffmpeg', cmd)
-    
+    @staticmethod
+    def concatenate_steam(
+        *videos: Video,
+        output_path: str,
+        transition_effect:VALID_TRANSITIONS|None = None,
+        transition_duration: int = 1
+    ) -> Video:
+        """
+        Concatenates video
+        """
+        size = "720x1080"
+        cmd = []
+        frame_rate = 24
+        
+        for video in videos:
+            cmd.extend(['-i', str(video)])
+        
+        # Apply scale filter so no error raise
+        filter_complex = []
+        for idx in range(len(videos)):
+            filter_complex.append(f"[{idx}:v]scale={size},fps={frame_rate},settb=AVTB[vid{idx}]")
+        
+        
+        # Generate xfade transitions method
+        xfade = lambda id1,id2,out,offset: filter_complex.append(
+            (f"[{id1}][{id2}]xfade=transition={transition_effect}:"
+            f"duration={transition_duration}:offset={offset}[{out}]")
+        )
+        # 1. creating first videos
+        nidx = ('v0',videos[0].duration-transition_duration)
+        xfade('vid0','vid1',nidx[0],nidx[1])
+        nidx = (nidx[0], nidx[1] + videos[1].duration-transition_duration)
+        
+        # 2. creating remain videos
+        for idx in range(2,len(videos)):
+            xfade(nidx[0], f'vid{idx}', f'v{idx-1}', nidx[1])
+            nidx = (f'v{idx-1}', nidx[1] + videos[idx].duration-transition_duration)
+        
+        audio_concat = "".join([f"[{idx}:a]" for idx in range(len(videos))])
+        audio_filter = f"{audio_concat}concat=n={len(videos)}:v=0:a=1[a]"
+        filter_complex.append(audio_filter)
+        
+        # final output
+        filter_complex.append(f"[{nidx[0]}]format=yuv420p[final]")
+        cmd.extend(['-filter_complex', '; '.join(filter_complex)])
+        cmd.extend(['-map', '[final]','-y','-map','[a]', output_path])
+        
+        ffmpeg.run('ffmpeg', cmd, False)
+        return Video(output_path)
 
-
-VALID_TRANSITIONS = Literal[
-    "fade", "fadeblack", "fadewhite", "distance",
-    "wipeleft", "wiperight", "wipeup", "wipedown",
-    "slideleft", "slideright", "slideup", "slidedown",
-    "smoothleft", "smoothright", "smoothup", "smoothdown",
-    "circlecrop","rectcrop","circleclose", "circleopen",
-    "horzclose", "horzopen", "vertclose", "vertopen",
-    "diagbl", "diagbr", "diagtl", "diagtr", 
-    "hlslice", "hrslice", "vuslice", "vdslice",
-    "dissolve", "pixelize", "radial", "hblur",
-    "wipetl", "wipetr", "wipebl", "wipebr",
-    "fadegrays", "squeezev", "squeezeh", "zoomin",
-    "hlwind", "hrwind", "vuwind","vdwind",
-    "coverleft", "coverright", "coverup ","coverdown",
-    "revealleft", "revealright","revealup,"
-]
-
-def concatenate_steam(
-    *videos: Video,
-    output_path: str,
-    transition_effect:VALID_TRANSITIONS|None = None,
-    transition_duration: int = 1
-) -> Video:
-    """
-    Concatenates video
-    """
-    size = "720x1080"
-    cmd = []
-    frame_rate = 24
-    
-    for video in videos:
-        cmd.extend(['-i', str(video)])
-    
-    # Apply scale filter so no error raise
-    filter_complex = []
-    for idx in range(len(videos)):
-        filter_complex.append(f"[{idx}:v]scale={size},fps={frame_rate},settb=AVTB[vid{idx}]")
-    
-    
-    # Generate xfade transitions method
-    xfade = lambda id1,id2,out,offset: filter_complex.append(
-        (f"[{id1}][{id2}]xfade=transition={transition_effect}:"
-         f"duration={transition_duration}:offset={offset}[{out}]")
-    )
-    # 1. creating first videos
-    nidx = ('v0',videos[0].duration-transition_duration)
-    xfade('vid0','vid1',nidx[0],nidx[1])
-    nidx = (nidx[0], nidx[1] + videos[1].duration-transition_duration)
-    
-    # 2. creating remain videos
-    for idx in range(2,len(videos)):
-        xfade(nidx[0], f'vid{idx}', f'v{idx-1}', nidx[1])
-        nidx = (f'v{idx-1}', nidx[1] + videos[idx].duration-transition_duration)
-    
-    audio_concat = "".join([f"[{idx}:a]" for idx in range(len(videos))])
-    audio_filter = f"{audio_concat}concat=n={len(videos)}:v=0:a=1[a]"
-    filter_complex.append(audio_filter)
-    
-    # final output
-    filter_complex.append(f"[{nidx[0]}]format=yuv420p[final]")
-    cmd.extend(['-filter_complex', '; '.join(filter_complex)])
-    cmd.extend(['-map', '[final]','-y','-map','[a]', output_path])
-    
-    ffmpeg.run('ffmpeg', cmd, False)
-    return Video(output_path)
-
-
-
-class effect:
-    pass
-
-
-
-class CustomVideoCreator:
-    
-    def __init__(self):
-        pass
-    
-    def countdown(self):
-        pass
     

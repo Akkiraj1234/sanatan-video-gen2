@@ -4,6 +4,7 @@ venv/
 ffmpeg/
 
 media/temp/*
+assets/temp/*
 src-old/*
 test-ffmpeg-engion/
 test-ffmpeg-engion/*

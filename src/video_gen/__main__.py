@@ -1,5 +1,5 @@
-from video_gen.parser import parse_file, demo_json_data
 from video_gen.engion import Engine
+from video_gen.utility import parse_file, demo_json_data
 from argparse import ArgumentParser, Namespace
 import sys
 
@@ -25,7 +25,7 @@ def parse_arguments() -> Namespace:
 
 def execute(file_path:str) -> None:
     tasks = parse_file(file_path)
-    tasks = demo_json_data()
+    tasks = demo_json_data() # for demo and debug
     engion = Engine()
     
     for task in tasks:

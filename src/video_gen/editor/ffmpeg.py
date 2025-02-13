@@ -7,7 +7,6 @@ import json
 ffmpeg_path = assets.ffmpeg
 ffprobe_path = assets.ffprobe
 terminal = False
-terminal_info = ['-hide_banner'] #'-loglevel error' , '-progress pipe:1'
 
 
 class FFmpeg:
@@ -90,9 +89,12 @@ class FFmpeg:
             if OS_NAME == 'Windows':
                 kwargs['creationflags'] = subprocess.CREATE_NO_WINDOW
                 
+        before = []                                                  #['cpulimit', '-l', '50', '--', 'ffmpeg']
+        terminal_info = ['-hide_banner', '-loglevel', 'error']       #'-progress', 'pipe:1'
+        cpu_manage = ['-preset', 'ultrafast', '-threads', '2']
         try:
             result = subprocess.run(
-                base_command + args,# + terminal_info,
+                before + base_command + args + terminal_info + cpu_manage,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
@@ -291,3 +293,5 @@ def get_MediaInfo(file_path: str) -> MediaInfo:
         return MediaInfo(json.loads(result.stdout))
     except json.JSONDecodeError as e:
         raise ValueError("Failed to parse ffprobe output") from e
+
+ffmpeg = FFmpeg()
