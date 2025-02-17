@@ -1,0 +1,65 @@
+/* Container styling */
+.container {
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+/* Auto-expanding textarea */
+.auto-textarea {
+  width: 100%;
+  min-height: 50px;
+  resize: none;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+  margin-bottom: 10px;
+  transition: border-color 0.3s;
+}
+
+.auto-textarea:focus {
+  outline: none;
+  border-color: #66afe9;
+}
+
+/* Submit button styling */
+.submit-button {
+  background-color: #4CAF50;
+  color: white;
+  padding: 10px 25px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+  background-color: #45a049;
+}
+
+/* Video container styling */
+.video-container {
+  margin-top: 30px;
+}
+
+/* Download link styling */
+.download-link {
+  display: inline-block;
+  margin-top: 10px;
+  background-color: #2196F3;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  transition: background-color 0.3s;
+}
+
+.download-link:hover {
+  background-color: #0b7dda;
+}
+

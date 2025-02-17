@@ -14,3 +14,8 @@ test-ffmpeg-engion/*
 *.env
 *.ini
 *.log
+
+/ffmpeg_learn
+ffmpeg_learn/
+ffmpeg_learn
+
