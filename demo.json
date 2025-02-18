@@ -1,0 +1,143 @@
+[
+    [
+        {
+            "title": "bholenath_neelkhant",
+            "width": 1080,
+            "height": 720,
+            "frame": 30,
+            "file_type": "mp4",
+            "bg_music": "/home/akkiraj/Desktop/QuestionAnswerAssets/QuestionAnswerAssets/bg.mp3",
+            "watermark": "/home/akkiraj/Desktop/QuestionAnswerAssets/QuestionAnswerAssets/watermark.png"
+        },
+        {
+            "video": "/home/akkiraj/Desktop/QuestionAnswerAssets/QuestionAnswerAssets/blue.mp4",
+            "text": [
+                "शिव जी को नीलकंठ क्यों कहा जाता है?",
+                ":countdown:3:"
+            ]
+        },
+        {
+            "video": "/home/akkiraj/Desktop/QuestionAnswerAssets/QuestionAnswerAssets/orange.mp4",
+            "text": [
+                "जब समुद्र मंथन से विष (हलाहल) निकला",
+                "तो देवता और असुर दोनों इसके प्रभाव से भयभीत हो गए। उस समय",
+                "शिव जी ने समस्त सृष्टि की रक्षा के लिए इस विष को ग्रहण किया।",
+                "उन्होंने इसे अपने गले में धारण किया और इसे नीचे नहीं उतरने दिया।",
+                "इसके कारण उनका कंठ नीला हो गया और उन्हें 'नीलकंठ' कहा जाने लगा।"
+            ]
+        }
+    ],
+    [
+        {
+            "title": "hanumanji",
+            "width": 1080,
+            "height": 720,
+            "frame": 30,
+            "file_type": "mp4"
+        },
+        {
+            "video": "/home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_v_1.jpg",
+            "text": [
+                "श्री हनुमान जी की कृपा से असंभव भी संभव है।",
+                "संकट मोचक हनुमान, भक्तों के कष्ट हरने वाले।",
+                "राम नाम की शक्ति से जीवन में हर बाधा दूर होती है।"
+            ],
+            "transition": "fade",
+            "effect": [
+                "Ken_Burns_top",
+                "flower-rain"
+            ]
+        },
+        {
+            "video": "/home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_v_2.jpg",
+            "text": [
+                "जय श्री राम!",
+                "श्री हनुमान जी की असीम कृपा सदैव बनी रहे।"
+            ],
+            "transition": "fade",
+            "effect": [
+                "Ken_Burns_top",
+                "flower-rain"
+            ]
+        },
+        {
+            "video": "/home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_v_3.jpg",
+            "text": [
+                "हनुमान जी की भक्ति से अजेय बनो।"
+            ],
+            "transition": "dissolve",
+            "effect": [
+                "Ken_Burns_top",
+                "white-flower-rain"
+            ]
+        },
+        {
+            "video": "/home/akkiraj/Desktop/sanatan-video-gen2/media/image/shrihanuman_v_3.jpg",
+            "text": [
+                "इस तरह के वीडियो के लिए सनातन का पालन करें",
+                "देखने के लिए धन्यवाद"
+            ],
+            "effect": [
+                "Ken_Burns_top",
+                "white-flower-rain"
+            ]
+        }
+    ],
+    [
+        {
+            "title": "radhaji",
+            "width": 720,
+            "height": 1080,
+            "frame": 60,
+            "file_type": "mp4"
+        },
+        {
+            "video": "/home/akkiraj/Desktop/sanatan-video-gen2/media/video/video2.mp4",
+            "text": [
+                "श्री राधा रानी की भक्ति से हृदय निर्मल होता है।",
+                ":countdown:3:"
+            ],
+            "transition": "fade"
+        },
+        {
+            "video": "/home/akkiraj/Desktop/sanatan-video-gen2/media/video/video1.mp4",
+            "text": [
+                "राधे राधे बोल, मन खुश हो जाएगा।",
+                "राधा नाम की महिमा अपरंपार।"
+            ],
+            "transition": "fade"
+        }
+    ],
+    [
+        {
+            "title": "krishnaji",
+            "width": 1080,
+            "height": 1080,
+            "frame": 60,
+            "file_type": "mp4"
+        },
+        {
+            "video": "/home/akkiraj/Desktop/sanatan-video-gen2/media/image/krishna1.jpg",
+            "text": [
+                "श्रीकृष्ण गोविंद हरे मुरारी।"
+            ],
+            "transition": "fade",
+            "effect": [
+                "zoom-in",
+                "light-shine"
+            ]
+        },
+        {
+            "video": "/home/akkiraj/Desktop/sanatan-video-gen2/media/image/krishna2.jpg",
+            "text": [
+                "कृष्ण नाम की महिमा अनंत है।",
+                "राधे कृष्ण की भक्ति से आत्मा शुद्ध होती है।"
+            ],
+            "transition": "dissolve",
+            "effect": [
+                "Ken_Burns_top",
+                "golden-glow"
+            ]
+        }
+    ]
+]
