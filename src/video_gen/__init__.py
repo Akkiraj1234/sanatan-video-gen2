@@ -1,12 +1,24 @@
+from video_gen.utils import project_root
+from video_gen.settings import setting_init
 from video_gen.logger import setup_logging
 from video_gen.video_gen import generate_video
 
 
-def init(
+def init(                                                                                                                                                         
     debug: bool = False,
-    log_to_console: bool = True,
+    log_to_console: bool = True
 ) -> None:
-    setup_logging(debug, log_to_console)
+    """
+    insialize new insaince
+    """
+    root = project_root()
+    setting = setting_init(root)
+    setup_logging(debug or setting.debug, log_to_console)
+    '
+    # setup audio
+    # setup image_gen
+    # video_gen then
+    
 
 
 _all__ = ['init', 'generate_video']
