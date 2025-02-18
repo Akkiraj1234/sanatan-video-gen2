@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "sanatan-video-gen"
+version = "0.1.0"
+description = ""
+authors = ["Akkiraj1234 <akhandr153@gmail.com>"]
+license = "custom"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+pillow = "^11.1.0"
+opencv-python = "^4.11.0.86"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
