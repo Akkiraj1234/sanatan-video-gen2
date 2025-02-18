@@ -1,4 +1,4 @@
-from video_gen import init
+from video_gen import init, generate_video
 
 
 
