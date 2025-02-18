@@ -1,6 +1,6 @@
 from video_gen.utils import project_root
 from video_gen.settings import setting_init
-from video_gen.logger import setup_logging
+from video_gen.logger import logging_init
 from video_gen.video_gen import generate_video
 
 
@@ -13,8 +13,8 @@ def init(
     """
     root = project_root()
     setting = setting_init(root)
-    setup_logging(debug or setting.debug, log_to_console)
-    '
+    logging_init(debug or setting.debug, log_to_console)
+    
     # setup audio
     # setup image_gen
     # video_gen then

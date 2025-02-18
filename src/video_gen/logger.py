@@ -23,7 +23,7 @@ def _video_gen_error(self, message: str, *args, **kwargs) -> None:
         self._log(VIDEO_GEN_ERROR_LEVEL, message, args, **kwargs)
 
 
-def setup_logging(debug: bool = False, log_to_console: bool = True, error_log:bool = True) -> None:
+def logging_init(debug: bool = False, log_to_console: bool = True, error_log:bool = True) -> None:
     """
     Configures application logging, including custom logging for video generation errors.
 
@@ -37,7 +37,7 @@ def setup_logging(debug: bool = False, log_to_console: bool = True, error_log:bo
     logger.setLevel(logging.DEBUG if debug else logging.WARNING)
     logger.propagate = False
 
-    # Remove existing handlers if setup_logging() is called multiple times
+    # Remove existing handlers if logging_init() is called multiple times
     if logger.hasHandlers():
         logger.handlers.clear()
 
@@ -50,7 +50,7 @@ def setup_logging(debug: bool = False, log_to_console: bool = True, error_log:bo
     file_handler.setFormatter(file_formatter)
     # file_handler.addFilter(ExcludeCustomLevelFilter())
     logger.addHandler(file_handler)
-
+    
     # Console handler (optional)
     if log_to_console:
         console_handler = logging.StreamHandler()

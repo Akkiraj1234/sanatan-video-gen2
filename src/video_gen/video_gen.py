@@ -3,6 +3,7 @@ from video_gen.settings import Setting
 from video_gen.utils import List, Dict, Tuple, Path, print_task, log_video_gen_error
 import logging
 
+logger = logging.getLogger(__name__)
 # 1. write log level messae here
 
 class generate_video:
@@ -19,16 +20,23 @@ class generate_video:
         
     def execute(self, data: List[Dict]) -> None:
         """
+        Executes the video generation process.
         """
+        logger.debug(f"Executing video generation with data: {data}")
         try:
             path, code, msge = self.engion.create(data)
+            logger.info(f"Video created successfully: {path}")
+            self.passed_tasks.append((data, code, msge))
+            self.count += 1
             
-        except Exception:
-            log_video_gen_error()
-        
+        except Exception as e:
+            logger.error(f"Error during video creation: {e}")
+            log_video_gen_error(data, e)
+            self.failed_tasks.append((data, str(e)))
+            
         finally:
             self.engion.clean_buffer()
-    
+            logger.debug("Buffer cleaned after video generation.")
     
     def summary(self) -> None:
         """
@@ -42,6 +50,5 @@ class generate_video:
         for task in self.failed_tasks:
             print(f"Error: {task[1]}")
             print_task(task[0], 0)
-        print(f"error log saved in {Setting.SETTING_LOG_PATH}")
-    
-    engion = get_engine()
+            
+        logger.warning(f"{len(self.failed_tasks)} video(s) failed to create. Check the error.log for details. Path: {Setting.SETTING_LOG_PATH}")
