@@ -1,0 +1,11 @@
+ffmpeg plus plus
+    link: https://github.com/numberwolf/FFmpeg-PlusPlus
+    dec: FFmpeg Extension: 1.Support GLSL OpenGL(Filter/Effect/Transition/Shader         s); 2. And Transcode FLV with HEVC/AV1/Opus Codec 
+
+ffmpeg plus opengl
+    link: https://github.com/RayMusk/FFmpeg-Plus-OpenGL 
+    dec: 🔥 OpenGL Filter for FFmpeg: Render video by your shaders(GLSL) | FFmpe         g Filter支持OpenGL Shader和LUT 渲染滤镜。 
+
+some opengl shaders
+    link https://github.com/numberwolf/FFmpeg-PlusPlus/blob/main/Plus-OpenGL-Patch/README_EN.MD
+    

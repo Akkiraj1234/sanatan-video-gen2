@@ -8,7 +8,6 @@ _default_settings = {
     "debug": False,
 }
 
-
 class Setting:
     """
     A singleton class that manages application settings.

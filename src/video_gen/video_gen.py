@@ -6,6 +6,8 @@ import logging
 logger = logging.getLogger(__name__)
 # 1. write log level messae here
 
+
+
 class generate_video:
     
     def __init__(self):
@@ -14,9 +16,7 @@ class generate_video:
         self.passed_tasks = []
         self.count = 0
         self.total = 0
-        self.engion = get_engine(
-            name = self.setting.video_engine
-        )
+        self.engion = get_engine(name = self.setting.video_engine)()
         
     def execute(self, data: List[Dict]) -> None:
         """

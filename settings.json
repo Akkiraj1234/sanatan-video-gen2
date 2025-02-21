@@ -1,4 +1,5 @@
 {
     "video_engine": "gen1",
-    "debug": false
+    "debug": false,
+    "audio_engion": "gtts"
 }
