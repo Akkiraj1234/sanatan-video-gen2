@@ -92,8 +92,8 @@ def log_execution(func):
         
         try:
             result = func(*args, **kwargs)
-            path = result[1] if isinstance(result, tuple) else result
-            logger.info(f"[SUCCESS] Audio successfully generated and saved at: {result}")
+            path = result[1] if isinstance(result, (tuple, list)) else result
+            logger.info(f"[SUCCESS] Audio successfully generated and saved at: {path}")
                 
         except Exception as e:
             logger.error(f"[ERROR] Failed to generate audio in {class_name}. Error: {e}")
