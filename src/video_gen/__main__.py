@@ -88,39 +88,8 @@ def main() -> int:
     args = parse_arguments() 
     
     init(args.debug)         #inisalize video_gen 
-    # execute(args.file_path)  #execute the code
-    main1()
+    execute(args.file_path)  #execute the code
     return 0
-
-def main1():
-    """
-    The main entry point for executing the program.
-    this method is for testing TempFile and SafeFile class and elevenlabs model
-    """
-    from video_gen.utils import TempFile
-    from video_gen.audio_gen.factory import get_TTSModel
-
-    if __name__ == "__main__":
-        try:
-            temp = TempFile()
-            model = get_TTSModel()
-            timestanps, audio = model.create_with_timestamp(
-                "Hello World", 
-                temp.create_unique_file(extension = "mp3")
-            )
-            print(audio.file_path,"\n",timestanps)
-           
-        except Exception as e:
-            print(f"Error: {e}")
-            raise
-            
-        finally:
-            TempFile.cleanup()
 
 if __name__ == "__main__":
     sys.exit(main())
-    
-    
-
-
-
