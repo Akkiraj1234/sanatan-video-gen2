@@ -145,7 +145,7 @@ class Video(Media):
         Returns:
             str: The video file path.
         """
-        return self.file_path
+        return str(self.file_path)
 
     def __len__(self) -> int:
         """
@@ -281,7 +281,7 @@ class Audio(Media):
         Returns:
             str: The audio file path.
         """
-        return self.file_path
+        return str(self.file_path)
 
     def __len__(self) -> int:
         """

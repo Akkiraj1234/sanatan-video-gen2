@@ -1,10 +1,31 @@
 from video_gen.editor.media import Audio
 from typing import List, Tuple
+import logging
 
+# logger info 
+logger = logging.getLogger(__name__)
 
+def _logg_timestamps(func):
+    def wrapper(*args, **kwargs):
+        func_name = func.__name__
+        logger.info(f"Using TIMESTAMP Model: {func_name} ")
+        
+        try: 
+            result = func(*args, **kwargs)
+            logger.info(f"[SUCCESS] Time stamps created; prev {result[:3]}...")
+        except Exception as e:
+            logger.error(f"[ERROR] Failed to generate Time stamps in {func_name}. Error: {e}")
+            raise 
+        
+        return result
+    return wrapper
+
+# main methods
 def get_timestamps(name:str) -> callable:
     return basic1
 
+
+@_logg_timestamps
 def basic1(text: str, audio: Audio) -> List[Tuple[int, int, str]]:
     """
     Generates timestamps for each word in the text and associates them with an audio file's duration.
@@ -35,3 +56,4 @@ def basic1(text: str, audio: Audio) -> List[Tuple[int, int, str]]:
         timestamps.append((start_time, end_time, word))
 
     return timestamps
+

@@ -62,7 +62,7 @@ def update_missing_key(json_path:Path, loaded_settings:dict) -> None:
         return
     
     updated_settings = {**loaded_settings, **_default_settings}
-    write_json(updated_settings)
+    write_json(json_path, updated_settings)
     
 
 def setting_init(root_path: Path):
@@ -95,8 +95,11 @@ setting = AttrDict(
     {
         "VIDEO_ENGION": "gen1",
         "DEBUG": False,
-        "TTS_MODLE": "ElevenLabsModel2",
+        "TTS_MODLE": "GTTSModel", #"ElevenLabsModel2",
         "TIMESTAMPS_MODLE": "basic1",
-        
+        "TTS_Lang": "hi",
+        "TTS_ELVENLABS_VOICE_ID": "FmBhnvP58BK0vz65OOj7", #"Sm1seazb4gs7RSlUVw7c",
+        "TTS_ELEVNLABS_MODEL_ID": "eleven_turbo_v2_5",
     }
 )
+# ELEVENLABS_API_KEY2=sk_9dadd4b84c2879c59a5e6078977235c224ccc8aa5ca1d797

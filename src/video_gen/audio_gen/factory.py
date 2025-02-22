@@ -33,11 +33,11 @@ def get_TTSModel(model_name:str|None = None) -> TTS:
     Loads the requested TTS model class (not instance) with caching.
     """
     if model_name is None:
-        model_name = setting.tts_model
+        model_name = setting.TTS_MODLE
     
     if not MODEL_CACHE:
         discover_tts_models()
-
+    
     if model_name in MODEL_CACHE:
         module_name = MODEL_CACHE[model_name]
         module = importlib.import_module(module_name)

@@ -1,6 +1,6 @@
 {
     "video_engine": "gen1",
     "debug": false,
-    "tts_model": "GTTSModel", //"ElevenLabsModel2" //"ElevenLabsModel1"
+    "tts_model": "ElevenLabsModel2",
     "timestamp_model": "basic1"
 }

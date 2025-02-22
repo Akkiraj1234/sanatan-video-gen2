@@ -155,7 +155,21 @@ def class_only(method):
         return method(cls, *args, **kwargs)
     return wrapper
 
+def disable_logging(module_name: str):
+    logger = logging.getLogger(module_name)
+    
+    # Remove all handlers
+    for handler in logger.handlers[:]:
+        logger.removeHandler(handler)
+    
+    # Prevent logs from propagating
+    logger.propagate = False
+    logger.setLevel(logging.CRITICAL)
+    logger.disabled = True
 
+
+def api_key(name:str) -> str:
+    return os.getenv(name)
 class Media:
     pass
 
