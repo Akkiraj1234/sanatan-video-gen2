@@ -8,6 +8,39 @@ import json
 import uuid
 import os
 
+logger = logging.getLogger(__name__)
+
+class AttrDict(UserDict):
+    """_summary_
+
+    Args:
+        UserDict (_type_): _description_
+    """
+    def __getattr__(self, key):
+        if key in self.data:  # Directly check self.data to avoid recursion
+            return self.data[key]
+        raise AttributeError(f"Attribute {key} not found")
+    
+    def __setattr__(self, key, value):
+        if key == "data":  # Allow setting 'data' in UserDict
+            super().__setattr__(key, value)
+        else:
+            self.data[key] = value  # Store in self.data to prevent recursion
+
+    def __delattr__(self, key):
+        if key in self.data:
+            del self.data[key]
+        else:
+            raise AttributeError(f"Attribute {key} not found")
+
+
+
+setting = AttrDict(
+        {
+            "tts_model": "GTTSModel",
+            "timestamp_model": "basic1",
+        }
+    )
 
 def project_root() -> Path:
     """
@@ -22,11 +55,12 @@ def sstrip(string:str) -> str:
     # return "".join(s for s in string if s not in " \t\n\r")
     return string.translate(str.maketrans("", "", " \t\n\r"))
 
-def generate_unique_path(temp_path:str, file_type:str) -> str:
+def generate_unique_path(temp_path:str, file_type:str|None = None) -> Path:
     """
     genrate a unique path name
     """
-    return(os.path.join(temp_path, f"{uuid.uuid4()}.{file_type}"))
+    file_type = f".{file_type}" if file_type is not None else ""
+    return Path(os.path.join(temp_path, f"{uuid.uuid4()}{file_type}"))
 
 def validate_file(file_path:str) -> bool:
     """
@@ -125,43 +159,171 @@ def print_task(tasks, detail: int = 2) -> None:
     print(f"{Style.RESET_ALL}├─ {AUDIO}Audio Files: {VALUE}{metadata.get('bg_audio', 'None')}{Style.RESET_ALL}")
     print(f"{Style.RESET_ALL}╰─{'─' * 40}{Style.RESET_ALL}\n")
 
-
 def clean_files(*paths: Union[str, Path, Iterable[Union[str, Path]]]):
     """
     Deletes the given file(s) safely without raising errors.
-
-    Args:
-        paths (Union[str, Path, Iterable[Union[str, Path]]]): 
-            Single or multiple file paths to delete.
-
-    Prints:
-        - A warning message if a file could not be deleted.
-        - Nothing if deletion is successful.
     """
     for path in paths:
-        if isinstance(path, Media):
-            path = str(path)
-            
         if isinstance(path, (list, tuple, set)):  # Handle iterable of paths
             clean_files(*path)
             continue
-        
+
         try:
-            path = Path(path)  # Convert to Path object
-            if path.exists():
-                path.unlink()
-                print(f"Deleted: {path}")
+            path = str(path)  # Ensure it's a string path
+            if os.path.exists(path):
+                os.remove(path)
+                logger.info(f"Deleted file: {path}")
             else:
-                print(f"Warning: File not found: {path}")
+                logger.warning(f"File not found: {path}")
+
         except Exception as e:
-            print(f"Error deleting {path}: {e}")
+            logger.error(f"Error deleting {path}: {e}")
+
+def class_only(method):
+    def wrapper(cls, *args, **kwargs):
+        if not isinstance(cls, type):
+            raise TypeError(f"{method.__name__} can only be accsessed via the class. not an instance.")
+        return method(cls, *args, **kwargs)
+    return wrapper
 
 
 class Media:
     pass
 
+class TempFile:
+    """
+    Manages temporary files automatically, ensuring they are 
+    deleted even if an error occurs.
 
+    Usage:
+    >>> temp = TempFile()
+    >>> path = temp.add_file("example.txt")
+    >>> del temp
+
+    Ensure cleanup with:
+    >>> if __name__ == "__main__":
+    >>>     try: main()
+    >>>     except Exception: raise
+    >>>     finally: TempFile.cleanup()
+    """
+    _instances = []
+
+    def __init__(self) -> None:
+        """
+        Create a TempFile instance and track it.
+        """
+        self.__class__._instances.append(self)
+        self.paths = set()
+    
+    
+    @classmethod
+    def cleanup(cls) -> None:
+        """
+        Delete all assets and clean up instance list.
+        """
+        _  = input("we are cleaning up")
+        num = len(cls._instances)
+        for instance in cls._instances[:]:
+            instance.delete()
+        
+        cls._instances.clear()
+        logger.info(f"All assets cleaned up. Instances removed: {num}")
+
+    def add_file(self, path: Union[str, Path]) -> None:
+        """
+        Add a file to track.
+        """
+        path = str(path)
+        if os.path.exists(path):
+            self.paths.add(path)
+        else:
+            raise FileNotFoundError(f"File not found: {path}")
+
+    def create_unique_file(self, extension: str = "tmp", path: Union[str, Path] = None) -> Path:
+        """
+        Create a unique file and track it.
+        """
+        if path is None:
+            path = os.getcwd()  # Default to current directory
+
+        unique_path = generate_unique_path(temp_path = path, file_type = extension)
+        self.paths.add(unique_path)
+        
+        # Ensure the file actually exists
+        with open(unique_path, "w") as f:
+            pass
+
+        return unique_path
+
+    def delete(self) -> None:
+        """
+        Delete all tracked files.
+        """
+        clean_files(self.paths)
+        self.paths = set()
+
+    def __del__(self):
+        """
+        Ensure instance is removed from tracking and files are deleted.
+        """
+        if self in self.__class__._instances:
+            self.__class__._instances.remove(self)
+        
+        self.delete()
+
+    def __enter__(self):
+        """
+        Support `with` statement (context manager).
+        """
+        return self
+    
+    def __exit__(self, exc_type, exc_value, traceback):
+        """
+        Auto-delete assets when exiting `with` block.
+        """
+        self.delete()
+
+
+import os
+from video_gen.utils import TempFile  # Import TempFile class
+
+class SafeFile:
+    """
+    Safely manage file operations by ensuring files are cleaned up if an error occurs.
+    """
+    def __init__(self, path:Union[str, Path, List, Tuple]) -> None:
+        """
+        Initialize the SafeFile instance and track the file path
+        """
+        if isinstance(path, (str, Path)):
+            path = [str(path)]
+        elif isinstance(path, (list, tuple)):
+            path = list(path)
+        else:
+            raise TypeError(f"Invalid path type: {type(path)}")
+        
+        self.path:List[str] = path
+        self.temp = TempFile()
+        
+    def __enter__(self):
+        return self 
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_type is not None:
+            print(f"adding to path TempFile path")
+            for path in self.path:
+                self.temp.add_file(path)
+                
+        return False 
+
+        
+        
 class AttrDict(UserDict):
+    """_summary_
+
+    Args:
+        UserDict (_type_): _description_
+    """
     def __getattr__(self, key):
         if key in self.data:  # Directly check self.data to avoid recursion
             return self.data[key]
@@ -179,3 +341,37 @@ class AttrDict(UserDict):
         else:
             raise AttributeError(f"Attribute {key} not found")
 
+
+OS_NAME = os.name
+def validate_executable(name: str, path: str):
+    """
+    Validate that the given executable exists and is a valid file.
+
+    Args:
+        name (str): The name of the executable (e.g., "ffmpeg" or "ffprobe").
+        path (str): The expected path to the executable.
+
+    Raises:
+        FileNotFoundError: If the executable is not found in the given path and is not in the system's PATH.
+        PermissionError: If the given path exists but is not a valid file.
+    """
+    if not os.path.exists(path):
+        if path == "ffmpeg" or path == "ffprobe":
+            return 
+        raise FileNotFoundError(f"{name} not found at: {path}")
+
+    if not os.path.isfile(path):
+        raise PermissionError(f"{name} path is not a file: {path}")
+    
+
+
+def validate_file(file_path:str) -> bool:
+    return os.path.exists(file_path)
+
+
+DIR = project_root()
+class assets:
+    temp_path = os.path.join(DIR, "assets", "temp")
+    font_path = os.path.join(DIR, "assets","font","Mangal Regular.ttf")
+    ffmpeg  = "ffmpeg"
+    ffprobe = "ffprobe"

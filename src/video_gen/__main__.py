@@ -92,3 +92,30 @@ def main() -> int:
 if __name__ == "__main__":
     sys.exit(main())
     
+    
+
+# def main():
+#     """
+#     The main entry point for executing the program.
+#     this method is for testing TempFile and SafeFile class
+#     """
+#     from video_gen.utils import TempFile
+#     from video_gen.audio_gen.factory import get_TTSModel
+
+#     if __name__ == "__main__":
+#         try:
+#             temp = TempFile()
+#             model = get_TTSModel()
+#             timestanps, audio = model.create_with_timestamp(
+#                 "Hello World", 
+#                 temp.create_unique_file(extension = "wav")
+#             )
+#             print(audio.file_path,"\n",timestanps)
+           
+#         except Exception as e:
+#             print(f"Error: {e}")
+#             raise
+            
+#         finally:
+#             TempFile.cleanup()
+

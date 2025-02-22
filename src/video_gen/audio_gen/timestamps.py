@@ -1,0 +1,37 @@
+from video_gen.editor.media import Audio
+from typing import List, Tuple
+
+
+def get_timestamps(name:str) -> callable:
+    return basic1
+
+def basic1(text: str, audio: Audio) -> List[Tuple[int, int, str]]:
+    """
+    Generates timestamps for each word in the text and associates them with an audio file's duration.
+    
+    Args:
+        text (str): The text to be timestamped.
+        audio (Audio): An Audio object with a 'duration' attribute in seconds.
+    
+    Returns:
+        list: A list of tuples containing the start and end timestamps in milliseconds for each word.
+        
+    """
+    if not isinstance(audio, Audio):
+        raise ValueError("Argument 'audio' should be an instance of Audio")
+    
+    words = text.split()
+    if not words:
+        return []
+    
+    # Convert total duration from seconds to milliseconds
+    total_duration_ms = audio.duration * 1000
+    word_duration_ms = total_duration_ms / len(words)
+    timestamps = []
+    
+    for idx, word in enumerate(words):
+        start_time = int(idx * word_duration_ms)
+        end_time = int((idx + 1) * word_duration_ms)
+        timestamps.append((start_time, end_time, word))
+
+    return timestamps
