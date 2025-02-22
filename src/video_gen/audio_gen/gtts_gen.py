@@ -1,6 +1,6 @@
-from video_gen.utils import SafeFile
-from video_gen.editor.media import Audio
 from video_gen.audio_gen.base import TTS
+from video_gen.editor.media import Audio
+from video_gen.utils import SafeFile
 from typing import List, Tuple
 import gtts
 

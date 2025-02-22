@@ -1,4 +1,4 @@
-from video_gen.utils import sstrip, write_json, Path
+from video_gen.utils import sstrip, write_json, Path, AttrDict
 import json
 
 
@@ -6,6 +6,8 @@ import json
 _default_settings = {
     "video_engine": "gen1",
     "debug": False,
+    "tts_model": "ElevenLabsModel2",
+    "timestamp_model": "basic1",
 }
 
 class Setting:
@@ -86,3 +88,15 @@ def setting_init(root_path: Path):
     update_missing_key(json_path, loaded_settings)
     
     return Setting(final_settings)
+
+
+
+setting = AttrDict(
+    {
+        "VIDEO_ENGION": "gen1",
+        "DEBUG": False,
+        "TTS_MODLE": "ElevenLabsModel2",
+        "TIMESTAMPS_MODLE": "basic1",
+        
+    }
+)

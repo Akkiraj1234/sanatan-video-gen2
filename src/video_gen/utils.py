@@ -10,37 +10,6 @@ import os
 
 logger = logging.getLogger(__name__)
 
-class AttrDict(UserDict):
-    """_summary_
-
-    Args:
-        UserDict (_type_): _description_
-    """
-    def __getattr__(self, key):
-        if key in self.data:  # Directly check self.data to avoid recursion
-            return self.data[key]
-        raise AttributeError(f"Attribute {key} not found")
-    
-    def __setattr__(self, key, value):
-        if key == "data":  # Allow setting 'data' in UserDict
-            super().__setattr__(key, value)
-        else:
-            self.data[key] = value  # Store in self.data to prevent recursion
-
-    def __delattr__(self, key):
-        if key in self.data:
-            del self.data[key]
-        else:
-            raise AttributeError(f"Attribute {key} not found")
-
-
-
-setting = AttrDict(
-        {
-            "tts_model": "GTTSModel",
-            "timestamp_model": "basic1",
-        }
-    )
 
 def project_root() -> Path:
     """

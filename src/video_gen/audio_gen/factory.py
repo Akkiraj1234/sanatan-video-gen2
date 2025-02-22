@@ -1,4 +1,4 @@
-from video_gen.utils import setting
+from video_gen.settings import setting
 from video_gen.audio_gen.base import TTS
 import importlib
 import pkgutil

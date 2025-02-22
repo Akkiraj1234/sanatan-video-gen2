@@ -1,5 +1,6 @@
 {
     "video_engine": "gen1",
     "debug": false,
-    "audio_engion": "gtts"
+    "tts_model": "GTTSModel", //"ElevenLabsModel2" //"ElevenLabsModel1"
+    "timestamp_model": "basic1"
 }

@@ -1,5 +1,6 @@
-from video_gen.utils import setting, Media
 from video_gen.audio_gen.timestamps import get_timestamps
+from video_gen.utils import Media
+from video_gen.settings import setting
 from typing import List, Tuple
 
 

@@ -1,5 +1,6 @@
 from argparse import ArgumentParser, Namespace
 from video_gen import generate_video
+from video_gen.utils import TempFile  
 from video_gen import init
 import logging
 import json
@@ -69,6 +70,8 @@ def execute(file_path:str) -> None:
         
     except Exception as e:
         logging.error(f"An unexpected error occurred: {e}")
+    finally:
+        TempFile.cleanup()
 
 
 def main() -> int:
@@ -88,16 +91,10 @@ def main() -> int:
     execute(args.file_path)  #execute the code
     return 0
 
-
-if __name__ == "__main__":
-    sys.exit(main())
-    
-    
-
 # def main():
 #     """
 #     The main entry point for executing the program.
-#     this method is for testing TempFile and SafeFile class
+#     this method is for testing TempFile and SafeFile class and elevenlabs model
 #     """
 #     from video_gen.utils import TempFile
 #     from video_gen.audio_gen.factory import get_TTSModel
@@ -108,7 +105,7 @@ if __name__ == "__main__":
 #             model = get_TTSModel()
 #             timestanps, audio = model.create_with_timestamp(
 #                 "Hello World", 
-#                 temp.create_unique_file(extension = "wav")
+#                 temp.create_unique_file(extension = "mp3")
 #             )
 #             print(audio.file_path,"\n",timestanps)
            
@@ -118,4 +115,11 @@ if __name__ == "__main__":
             
 #         finally:
 #             TempFile.cleanup()
+
+if __name__ == "__main__":
+    sys.exit(main())
+    
+    
+
+
 
