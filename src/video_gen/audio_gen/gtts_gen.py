@@ -6,7 +6,8 @@ from typing import List, Tuple
 import gtts, logging
 
 # logging work
-disable_logging('gtts')
+disable_logging("gtts")
+disable_logging("urllib3")
 logger = logging.getLogger(__name__)
 
 

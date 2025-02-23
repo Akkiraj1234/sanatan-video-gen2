@@ -12,6 +12,39 @@ error_log_path = project_root() / 'error.log'
 VIDEO_GEN_ERROR_LEVEL = 60
 logging.addLevelName(VIDEO_GEN_ERROR_LEVEL, "VIDEO_GEN_ERROR")
 
+class ColoredFormatter(logging.Formatter):
+    def format(self, record):
+        level_colors = {
+            "DEBUG": Fore.BLUE + Style.BRIGHT,
+            "INFO": Fore.GREEN + Style.BRIGHT,
+            "WARNING": Fore.YELLOW + Style.BRIGHT,
+            "ERROR": Fore.RED + Style.BRIGHT,
+            "CRITICAL": Fore.MAGENTA + Style.BRIGHT,
+            "VIDEO_GEN_ERROR": Fore.CYAN + Style.BRIGHT
+        }
+        message_colors = {
+            "DEBUG": Fore.LIGHTBLUE_EX,
+            "INFO": Fore.LIGHTGREEN_EX,
+            "WARNING": Fore.LIGHTYELLOW_EX,
+            "ERROR": Fore.LIGHTRED_EX,
+            "CRITICAL": Fore.LIGHTMAGENTA_EX,
+            "VIDEO_GEN_ERROR": Fore.LIGHTCYAN_EX
+        }
+        ITALIC = "\033[3m"
+        RESET_ITALIC = "\033[0m"
+        time_color = Fore.LIGHTBLACK_EX + ITALIC
+        name_color = Fore.LIGHTBLUE_EX 
+        reset = Style.RESET_ALL
+        
+        formatted_message = super().format(record)
+        formatted_message = formatted_message.replace(record.levelname, f"{level_colors.get(record.levelname, Fore.WHITE)}{record.levelname}{reset}")
+        formatted_message = formatted_message.replace(record.msg, f"{message_colors.get(record.levelname, Fore.WHITE)}{record.msg}{reset}")
+        formatted_message = formatted_message.replace(str(record.asctime), f"{time_color}{record.asctime}{RESET_ITALIC}{reset}")
+        formatted_message = formatted_message.replace(record.name, f"{name_color}{record.name}{reset}")
+        
+        return formatted_message
+            
+            
 class ExcludeCustomLevelFilter(logging.Filter):
     """
     Filter to exclude custom log level from being shown in console.
@@ -49,37 +82,6 @@ def logging_init(debug: bool = False, log_to_console: bool = True, error_log: bo
     if log_to_console:
         console_handler = logging.StreamHandler(sys.stdout)
         console_handler.setLevel(logging.DEBUG if debug else logging.WARNING)
-        
-        class ColoredFormatter(logging.Formatter):
-            def format(self, record):
-                level_colors = {
-                    "DEBUG": Fore.BLUE + Style.BRIGHT,
-                    "INFO": Fore.GREEN + Style.BRIGHT,
-                    "WARNING": Fore.YELLOW + Style.BRIGHT,
-                    "ERROR": Fore.RED + Style.BRIGHT,
-                    "CRITICAL": Fore.MAGENTA + Style.BRIGHT,
-                    "VIDEO_GEN_ERROR": Fore.CYAN + Style.BRIGHT
-                }
-                message_colors = {
-                    "DEBUG": Fore.LIGHTBLUE_EX,
-                    "INFO": Fore.LIGHTGREEN_EX,
-                    "WARNING": Fore.LIGHTYELLOW_EX,
-                    "ERROR": Fore.LIGHTRED_EX,
-                    "CRITICAL": Fore.LIGHTMAGENTA_EX,
-                    "VIDEO_GEN_ERROR": Fore.LIGHTCYAN_EX
-                }
-                ITALIC = "\033[3m"
-                RESET_ITALIC = "\033[0m"
-                time_color = Fore.LIGHTBLACK_EX + ITALIC
-                reset = Style.RESET_ALL
-                
-                formatted_message = super().format(record)
-                formatted_message = formatted_message.replace(record.levelname, f"{level_colors.get(record.levelname, Fore.WHITE)}{record.levelname}{reset}")
-                formatted_message = formatted_message.replace(record.msg, f"{message_colors.get(record.levelname, Fore.WHITE)}{record.msg}{reset}")
-                formatted_message = formatted_message.replace(str(record.asctime), f"{time_color}{record.asctime}{RESET_ITALIC}{reset}")
-                
-                return formatted_message
-        
         console_formatter = ColoredFormatter(
             "%(asctime)s - %(name)s - %(levelname)s [ %(lineno)d ] : %(message)s"
         )
