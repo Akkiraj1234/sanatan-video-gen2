@@ -170,6 +170,7 @@ def disable_logging(module_name: str):
 
 def api_key(name:str) -> str:
     return os.getenv(name)
+
 class Media:
     pass
 
@@ -204,7 +205,6 @@ class TempFile:
         """
         Delete all assets and clean up instance list.
         """
-        _  = input("we are cleaning up")
         num = len(cls._instances)
         for instance in cls._instances[:]:
             instance.delete()

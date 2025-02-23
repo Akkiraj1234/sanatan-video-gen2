@@ -23,16 +23,31 @@ class Setting:
     _initialized = False
     
 
-    def __new__(cls, *args, **kwargs):
-        """
-        Ensures only one instance of the class exists.
-        """
+    
+    def __new__(cls, settings_dict=None):  # Accept settings_dict in __new__
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._instance._initialized = False 
+            cls._instance._initialized = False
             
+            # Initialize settings here
+            if settings_dict is not None:
+                cls._instance._initialize(settings_dict)  # Manually initialize
+        
         return cls._instance
 
+    def _initialize(self, settings_dict):
+        """ Initializes settings if not already initialized. """
+        if not self._initialized:
+            for key, value in settings_dict.items():
+                object.__setattr__(self, sstrip(key), value)
+            self._initialized = True 
+
+    def __setattr__(self, key, value):
+        """ Prevents modification after initialization. """
+        if self._initialized:
+            raise AttributeError("Settings are immutable after initialization")
+        super().__setattr__(key, value)
+    #-------------------------------------------------
     def __init__(self, settings_dict):
         """
         Initializes settings if not already initialized.
@@ -102,4 +117,3 @@ setting = AttrDict(
         "TTS_ELEVNLABS_MODEL_ID": "eleven_turbo_v2_5",
     }
 )
-# ELEVENLABS_API_KEY2=sk_9dadd4b84c2879c59a5e6078977235c224ccc8aa5ca1d797

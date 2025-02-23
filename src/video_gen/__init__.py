@@ -23,4 +23,4 @@ def init(
     
 
 
-_all__ = ['init', 'generate_video']
+__all__ = ['init', 'generate_video']
