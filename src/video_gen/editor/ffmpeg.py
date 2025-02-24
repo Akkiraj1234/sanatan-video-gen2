@@ -98,7 +98,7 @@ class FFmpeg:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
                 text=True,
-                # check=check,
+                check=check,
                 **kwargs
             )
             return result

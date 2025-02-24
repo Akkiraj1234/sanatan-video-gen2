@@ -2,12 +2,13 @@
     [
         {
             "title": "bholenath_neelkhant",
-            "width": 1080,
-            "height": 720,
+            "width": 720,
+            "height": 1280,
             "frame": 30,
             "file_type": "mp4",
             "bg_music": "/home/akkiraj/Desktop/QuestionAnswerAssets/QuestionAnswerAssets/bg.mp3",
-            "watermark": "/home/akkiraj/Desktop/QuestionAnswerAssets/QuestionAnswerAssets/watermark.png"
+            "watermark": "/home/akkiraj/Desktop/QuestionAnswerAssets/QuestionAnswerAssets/watermark.png",
+            "padding": 100
         },
         {
             "video": "/home/akkiraj/Desktop/QuestionAnswerAssets/QuestionAnswerAssets/blue.mp4",
@@ -18,6 +19,7 @@
         },
         {
             "video": "/home/akkiraj/Desktop/QuestionAnswerAssets/QuestionAnswerAssets/orange.mp4",
+            "v_postion": "left",
             "text": [
                 "जब समुद्र मंथन से विष (हलाहल) निकला",
                 "तो देवता और असुर दोनों इसके प्रभाव से भयभीत हो गए। उस समय",
@@ -30,8 +32,8 @@
     [
         {
             "title": "hanumanji",
-            "width": 1080,
-            "height": 720,
+            "width": 720,
+            "height": 1280,
             "frame": 30,
             "file_type": "mp4"
         },

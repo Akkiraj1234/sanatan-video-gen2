@@ -1,7 +1,7 @@
 from __future__ import annotations
-from typing import Dict
-from video_gen.editor.ffmpeg import get_MediaInfo
 from video_gen.utils import Media
+from video_gen.editor.ffmpeg import get_MediaInfo
+from typing import Dict
 
 
 class Video(Media):

@@ -28,7 +28,7 @@ def get_engine(name: str) -> Type[BaseEngine]:
     """
     try:
         module = importlib.import_module(f"video_gen.engine.{name}_engine")
-        engine_class = getattr(module, f"{name.capitalize()}Engine")
+        engine_class = getattr(module, "Engine")
         return engine_class
     
     except (ModuleNotFoundError, AttributeError) as e:

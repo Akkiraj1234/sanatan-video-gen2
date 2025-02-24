@@ -58,7 +58,7 @@ def convert_to_word_timestamps(characters: List[str], start_times: List[float], 
     for i, char in enumerate(characters):
         if re.match(r'[\s\p{Z}\p{P}]', char): # Space or punctuation -> finalize word
             if current_word:
-                timestamps.append((word_start_time, word_end_time, current_word))
+                timestamps.append((word_start_time/1000, word_end_time/1000, current_word))
                 current_word = ""
             word_start_time = None
         else:
@@ -69,7 +69,7 @@ def convert_to_word_timestamps(characters: List[str], start_times: List[float], 
 
     # Add last word if exists
     if current_word:
-        timestamps.append((word_start_time, word_end_time, current_word))
+        timestamps.append((word_start_time/1000, word_end_time/1000, current_word))
 
     return timestamps
 

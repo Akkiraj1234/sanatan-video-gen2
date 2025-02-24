@@ -53,7 +53,7 @@ def basic1(text: str, audio: Audio) -> List[Tuple[int, int, str]]:
     for idx, word in enumerate(words):
         start_time = int(idx * word_duration_ms)
         end_time = int((idx + 1) * word_duration_ms)
-        timestamps.append((start_time, end_time, word))
-
+        timestamps.append((start_time/1000, end_time/1000, word))
+    # timestamps[-1] = (timestamps[-1][0],timestamps[-1][1] + 4, timestamps[-1][2])
     return timestamps
 

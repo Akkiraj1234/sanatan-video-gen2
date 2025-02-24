@@ -1,12 +1,24 @@
-from typing import List, Dict
-from video_gen.audio_gen import Tts, get_timestamps
+from video_gen.audio_gen import get_TTSModel
 from video_gen.editor.media import Video, Audio
-from video_gen.editor.effects import effect_get
-from video_gen.editor.edit import edit, add_video_info
-from video_gen.subtitles_gen import  gen_trans_sub
-from video_gen.utils import generate_unique_path, os, AttrDict, clean_files, assets, print_task, copy_file
-from video_gen.editor.clips import countdown_video
-import time
+from video_gen.assets import Assets
+from video_gen.settings import setting
+from video_gen.editor import (
+    edit, 
+    gen_trans_sub,
+    typing_gen_trans_sub,
+    effect_get,
+    add_video_info
+)
+from video_gen.utils import (
+    generate_unique_path,
+    os, AttrDict,
+    clean_files, 
+    print_task,
+    copy_file,
+    TempFile,
+    SafeFile
+)
+from typing import List, Dict
 
 
 class Engine:
@@ -19,11 +31,12 @@ class Engine:
         """
         Initializes the Engine with tracking for failed tasks and count statistics.
         """
+        self.temp_file = TempFile()
+        self.texttospeach = get_TTSModel()
         self.failed_tasks = []  # Stores failed tasks along with error messages
+        self.semi_clip = []
         self.count = 0          # Number of successfully created videos
         self.total = 0          # Total attempted video creations
-        self.texttospeach = Tts()
-        self.semi_clip = []
     
     def _gather_info(self, info: Dict) -> dict:
         """
@@ -37,15 +50,17 @@ class Engine:
         """
         return AttrDict({
             'width': info.get('width', 720),
-            'height': info.get('height', 1080),
+            'height': info.get('height', 1280),
             'fps': info.get('fps', 24),
             'title': info.get('title', 'no_title'),
             'file_type': info.get('file_type', 'mp4'),
-            'font_name': info.get('font', assets.font_path),
-            'font_size': info.get('font_size', 50),
-            'bg_audio': info.get('bg_audio', None),
+            'font_name': Assets.Font.getpath(info.get('font', None)),
+            'font_size': info.get('font_size', 70),
+            'bg_audio': info.get('bg_music', None),
             'watermark': info.get('watermark', None),
-            'end_video': info.get('end_video', None)
+            'end_video': info.get('end_video', None),
+            'padding': info.get('padding', 100),
+            'text_color': info.get('text_color', '#FFFF00')
         })
 
     def _nano_clip_creation(self, text:str, file_info) -> Video:
@@ -54,18 +69,20 @@ class Engine:
         if not raise value error
         """
         # generating the music
-        audio = self.texttospeach.create(text)
-        timestamps = get_timestamps(text, audio)
         
-        mov = gen_trans_sub(
+        
+        timestamps, audio = self.texttospeach.create_with_timestamp(
+            script = text,
+            output_path = self.temp_file.create_unique_file("mp3")
+        )
+        
+        # mov = gen_trans_sub(
+        mov = typing_gen_trans_sub(
             text = text,
             audio = audio,
             timestamps = timestamps,
             file_info = file_info,
-            output_file = generate_unique_path(
-                temp_path = assets.temp_path,
-                file_type = 'mov'
-            ),
+            output_file = self.temp_file.create_unique_file("mov"),
         )
         clean_files((audio))
         return mov
@@ -86,6 +103,7 @@ class Engine:
         try:
             media = Video(task['video'])
             video_effect = task.get('effect', [])
+            v_postion = task.get('v_postion', 'center')
         except KeyError as e:
             raise ValueError('the format is not correct cloudnet find media and effect')
         
@@ -94,23 +112,20 @@ class Engine:
             effect = effect_get.get(effect)
             video = effect(
                 input_path = video,
-                output_path = generate_unique_path(
-                    temp_path = assets.temp_path,
-                    file_type = "mp4"
-                ),
-                total_duration = duration
+                output_path = self.temp_file.create_unique_file("mov"),
+                total_duration = duration,
+                position = v_postion
             )
 
         if video_effect == []:
             video = effect_get.get('no_effect')(
                 input_path = media,
-                output_path = generate_unique_path(
-                    temp_path = assets.temp_path,
-                    file_type = "mp4"
-                ),
-                duration = duration
+                output_path = self.temp_file.create_unique_file("mp4"),
+                duration = duration,
+                width = file_info.width,
+                height = file_info.height,
+                position = v_postion
             )
-            
         return video
     
     def analyze_text(self, task:List[str]) -> None:
@@ -144,32 +159,27 @@ class Engine:
         
         # creating nano clips
         nano_clips:List[Video] = []
+        
         for text in texts:
             nano_clip = self._nano_clip_creation(text, file_info)
             nano_clips.append(nano_clip)
-        print(texts)
-            
-        if extra == "countdown":
+        
+        if extra and extra is not None:
             nano_clips.append(
-                countdown_video(
+                Assets.Clips.get(extra)(
                     count=3,
-                    width=720,
-                    height=1080,
-                    output_file = generate_unique_path(
-                    temp_path = assets.temp_path,
-                    file_type="mov"
-                    ),
-                    audio = os.path.join("/home/akkiraj/Desktop/sanatan-video-gen2/assets/sound_effect", "sfxCountdown.mp3")
+                    width=file_info.width,
+                    height=file_info.height,
+                    output_file = self.temp_file.create_unique_file("mov"),
+                    audio = os.path.join("/home/akkiraj/Desktop/QuestionAnswerAssets/QuestionAnswerAssets", "sfxCountdown.wav"),
+                    font_path = file_info.font_name,
+                    color = file_info.text_color
                 )
             )
         
-        # creating the transparent clip
         semi_clip = edit.concatenate_by_video(
             videos = nano_clips,
-            output_path = generate_unique_path(
-                temp_path = assets.temp_path,
-                file_type="mov"
-            )
+            output_path = self.temp_file.create_unique_file('mov')
         )
         clean_files(nano_clips)
         return semi_clip
@@ -223,31 +233,24 @@ class Engine:
             Video: The processed video after applying final adjustments.
         """
         print("creating concatenate_steam")
-        main = edit.concatenate_steam(
+        main = edit.concatenate_stream(
             *clips,
-            output_path = generate_unique_path(
-                temp_path = assets.temp_path,
-                file_type = "mp4"
-            ),
+            output_path = self.temp_file.create_unique_file("mp4"),
             transition_duration=1,
-            transition_effect="fade"
+            transition_effect=None,
+            width = fine_info.width,
+            height = fine_info.height
         )
         print("creating concatenate_by_video")
         clips = edit.concatenate_by_video(
             self.semi_clip,
-            output_path = generate_unique_path(
-                temp_path = assets.temp_path,
-                file_type = "mov"
-            )
+            output_path = self.temp_file.create_unique_file("mov")
         )
         print("creating overlay_video_image")
         return edit.overlay_video_image(
             base_video = main,
             overlay_video = clips,
-            output_path = generate_unique_path(
-                temp_path = assets.temp_path,
-                file_type = "mp4"
-            )
+            output_path = self.temp_file.create_unique_file("mp4"),
         )
     
     def _final_video(self, video: Video, video_info) -> None:
@@ -258,10 +261,9 @@ class Engine:
         Args:
             video (Video): The final video ready for export.
         """
-        print(video_info)
         return add_video_info(
             video = video,
-            output_path = os.path.join(assets.temp_path,f'{video_info.title}.{video_info.file_type}'),
+            output_path = os.path.join(setting.temp_path,f'{video_info.title}.{video_info.file_type}'),
             watermark = video_info.get('watermark', None),
             bg_audio = video_info.get('bg_audio', None),
             end_video = video_info.get('end_video', None)   
@@ -300,13 +302,11 @@ class Engine:
             task (List[Dict]): List of tasks defining video generation workflow.
         """
         self.semi_clip =[]
+        path = None
+        code = 1
         try:
             print_task(task, 1)  # Log the task details
-            start_time = time.time()
             path = self.pipeline(task)
-            end_time = time.time()
-            execution_time = end_time - start_time
-            print(f"Video creation completed in {execution_time:.2f}s.")
             print(f"Video successfully created and saved at: {path}\n\n")
             self.count += 1
             
@@ -314,10 +314,12 @@ class Engine:
             self.failed_tasks.append([task, str(e)])
             print(f"Error occurred while creating video: {e}")
             print("Please check the task details and try again.\n")
+            code = 0
             raise
             
         finally:
             self.total += 1
+            return path, code, 'no message yet'
     
     def summary(self) -> None:
         """

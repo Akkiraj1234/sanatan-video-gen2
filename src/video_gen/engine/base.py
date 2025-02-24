@@ -1,6 +1,9 @@
 from video_gen.utils import List, Dict, Tuple, Path
 
 class BaseEngine:
+    """
+    
+    """
     def create(self, data: List[Dict]) -> Tuple[Path, int, str]:
         """
         This method should be implemented by child classes.
@@ -17,3 +20,5 @@ class BaseEngine:
         It should clean up any resources or temporary files used during video creation.
         """
         pass
+    
+# info about writing engion piplines

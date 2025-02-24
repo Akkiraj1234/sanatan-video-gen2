@@ -159,11 +159,12 @@ class ElevenLabsModel2(TTS):
         # genrating timstamps
         try: 
             timestamps = ElevenLabsModel2.extract_timestamp(response)
+            timestamps = ElevenLabsModel2.adjust_timestamps(timestamps, audio.duration)
         except ValueError as e:
             logger.warning(f"failed to generate timestamps: {e}")
             logger.info("Falling back to ElevenLabsModel1 for timestamp generation...")
             timestamps = ElevenLabsModel1.generate_timestamps(script, audio)
-        
+        print(timestamps)
         return timestamps, audio
 
     @staticmethod
@@ -171,7 +172,7 @@ class ElevenLabsModel2(TTS):
         """
         Extract timestamps from API response.
         """
-        alignment = response.get("normalized_alignment", {})
+        alignment = response.get("alignment", {})
         characters = alignment.get("characters", [])
         start_times = alignment.get("character_start_times_seconds", [])
         end_times = alignment.get("character_end_times_seconds", [])
@@ -180,4 +181,35 @@ class ElevenLabsModel2(TTS):
             raise ValueError("Missing alignment data in API response.")
         
         return convert_to_word_timestamps(characters, start_times, end_times)
+    
+    @staticmethod
+    def adjust_timestamps(timestamps, audio_duration):
+        """
+        Adjusts timestamps to evenly distribute words across the total audio duration,
+        considering character length proportions and ensuring proper alignment.
+        
+        :param timestamps: List of tuples (start_time, end_time, word)
+        :param audio_duration: Total duration of the audio file
+        :return: Adjusted timestamps as a list of tuples (start_time, end_time, word)
+        """
+        extra_time = 0.2  # Additional buffer time
+        total_duration = audio_duration + extra_time  # Extend total time slightly
+        
+        # Calculate total character count
+        total_chars = sum(len(word) for _, _, word in timestamps)
+        
+        # Calculate proportional duration per character
+        char_time = total_duration / total_chars
+        
+        adjusted = []
+        start_time = 0.0  # Start from zero
+        
+        for _, _, word in timestamps:
+            word_duration = len(word) * char_time  # Assign duration based on character count
+            end_time = start_time + word_duration
+            adjusted.append((start_time, end_time, word))
+            start_time = end_time  # Update for next word
+        
+        return adjusted
+
 

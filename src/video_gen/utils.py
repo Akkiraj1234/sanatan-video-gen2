@@ -56,7 +56,7 @@ def copy_file(old_location:Path|str, new_location:Path|str) -> Path:
     
     return new_location if isinstance(new_location, Path) else Path(new_location)
 
-def log_video_gen_error(data: dict, error_message: str, reason: str) -> None:
+def log_video_gen_error(data: dict = {}, error_message: str = '', reason: str = '') -> None:
     """
     Log a video generation error with the associated data and error message in JSON format.
     

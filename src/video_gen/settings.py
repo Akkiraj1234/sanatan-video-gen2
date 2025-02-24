@@ -35,7 +35,7 @@ class Setting:
         
         return cls._instance
 
-    def _initialize(self, settings_dict):
+    def _initialize(self, settings_dict = None):
         """ Initializes settings if not already initialized. """
         if not self._initialized:
             for key, value in settings_dict.items():
@@ -48,7 +48,7 @@ class Setting:
             raise AttributeError("Settings are immutable after initialization")
         super().__setattr__(key, value)
     #-------------------------------------------------
-    def __init__(self, settings_dict):
+    def __init__(self, settings_dict = None):
         """
         Initializes settings if not already initialized.
         """
@@ -110,10 +110,14 @@ setting = AttrDict(
     {
         "VIDEO_ENGION": "gen1",
         "DEBUG": False,
-        "TTS_MODLE": "GTTSModel", #"ElevenLabsModel2",
+        "TTS_MODLE": "ElevenLabsModel1", #"GTTSModel", #,ElevenLabsModel1
         "TIMESTAMPS_MODLE": "basic1",
         "TTS_Lang": "hi",
-        "TTS_ELVENLABS_VOICE_ID": "FmBhnvP58BK0vz65OOj7", #"Sm1seazb4gs7RSlUVw7c",
+        "TTS_ELVENLABS_VOICE_ID": "y6Ao4Y93UrnTbmzdVlFc", #"FmBhnvP58BK0vz65OOj7", #"Sm1seazb4gs7RSlUVw7c",
         "TTS_ELEVNLABS_MODEL_ID": "eleven_turbo_v2_5",
+        "ASSETS_PATH": Path("/home/akkiraj/Desktop/video-gen/assets"),
+        "temp_path": Path("/home/akkiraj/Desktop/video-gen/temp"),
+        "TEMP_PATH": Path("/home/akkiraj/Desktop/video-gen/temp"),
+        "SETTING_LOG_PATH": Path('/home/akkiraj/Desktop/video-gen/error.log')
     }
 )

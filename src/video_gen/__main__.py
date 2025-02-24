@@ -52,24 +52,29 @@ def execute(file_path:str) -> None:
                 json_data = json.load(json_fp)
             except json.JSONDecodeError as e:
                 logging.error(f"Error decoding JSON from the file: {e}")
-                return
+                raise
             except Exception as e:
                 logging.error(f"An unexpected error occurred while reading the JSON file: {e}")
-                return
+                raise
         
         for task in json_data:
             try:
-                engion.create(task)
+                engion.execute(task)
             except Exception as e:
                 logging.error(f"Error processing task {task}: {e}")
-                continue 
+                raise
+            return #-------------------------
+            
         engion.summary()
     
     except FileNotFoundError:
         logging.error(f"The file at {file_path} was not found.")
-        
+        raise
+    
     except Exception as e:
         logging.error(f"An unexpected error occurred: {e}")
+        raise
+    
     finally:
         TempFile.cleanup()
 
@@ -88,32 +93,8 @@ def main() -> int:
     args = parse_arguments() 
     
     init(args.debug)         #inisalize video_gen 
-    # execute(args.file_path)  #execute the code
-    main1()
+    execute(args.file_path)  #execute the code
     return 0
-
-def main1():
-    """
-    The main entry point for executing the program.
-    this method is for testing TempFile and SafeFile class and elevenlabs model
-    """
-    from video_gen.utils import TempFile
-    from video_gen.audio_gen.factory import get_TTSModel
-
-    if __name__ == "__main__":
-        try:
-            temp = TempFile()
-            model = get_TTSModel()
-            timestanps, audio = model.create_with_timestamp(
-                "Hello World", 
-                temp.create_unique_file(extension = "mp3")
-            )
-           
-        except Exception as e:
-            raise
-            
-        finally:
-            TempFile.cleanup()
 
 if __name__ == "__main__":
     sys.exit(main())

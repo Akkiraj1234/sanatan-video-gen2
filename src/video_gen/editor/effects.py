@@ -95,15 +95,103 @@ def Ken_Burns(
 def Ken_Burns_reversed(media:Video) -> Video:
     pass
 
+def calculate_crop_params(input_width: int, input_height: int, target_aspect_w: int, target_aspect_h: int, align: str = "center"):
+    """
+    Calculate the cropping parameters to maintain a given aspect ratio before resizing.
+    
+    Parameters:
+        input_width (int): Width of the input video.
+        input_height (int): Height of the input video.
+        target_aspect_w (int): Target aspect ratio width.
+        target_aspect_h (int): Target aspect ratio height.
+        align (str): Alignment for cropping ('left', 'center', 'right' for width cropping, 
+                     'top', 'center', 'bottom' for height cropping).
+                     Defaults to 'center'.
+    
+    Returns:
+        (start_x, start_y, crop_width, crop_height): Cropping parameters.
+    """
+    # Calculate aspect ratio scaling
+    input_aspect = input_width / input_height
+    target_aspect = target_aspect_w / target_aspect_h
+    
+    if input_aspect > target_aspect:
+        # Crop width to match target aspect ratio, keep full height
+        crop_width = int(input_height * target_aspect)
+        crop_height = input_height
+        start_y = 0
+        
+        if align == "left":
+            start_x = 0
+        elif align == "right":
+            start_x = input_width - crop_width
+        else:  # Center
+            start_x = (input_width - crop_width) // 2
+    else:
+        # Crop height to match target aspect ratio, keep full width
+        crop_width = input_width
+        crop_height = int(input_width / target_aspect)
+        start_x = 0
+        
+        if align == "top":
+            start_y = 0
+        elif align == "bottom":
+            start_y = input_height - crop_height
+        else:  # Center
+            start_y = (input_height - crop_height) // 2
+    
+    return start_x, start_y, crop_width, crop_height
 
-def copy_video(input_path: str, output_path: str, **kwargs):
+
+def copy_video(input_path: Video, output_path: str, duration: int, position: Literal['left', 'center', 'right'], **kwargs):
+    """
+    Copies a video file to a new location and processes it with ffmpeg.
+    Handles resizing, cropping, positioning, and looping.
+
+    Args:
+        input_path (Video): Source video file.
+        output_path (str): Destination path.
+        duration (int): Final video duration in seconds.
+        position (Literal['left', 'center', 'right']): Cropping position.
+    """
+    width, height = kwargs.get("width", 720), kwargs.get("height", 1280)
+    start_x, start_y, crop_width, crop_height = calculate_crop_params(
+        input_width = input_path.width,
+        input_height = input_path.height,
+        target_aspect_w = kwargs.get("width", 720),
+        target_aspect_h = kwargs.get("height", 1280),
+        align = position
+    )
+    # Looping logic
+    loop_count = duration // input_path.duration
+    if duration % input_path.duration != 0:
+        loop_count += 1
+        
+    loop_cmd = f"loop={loop_count}:1:0"
+    trim_cmd = f"trim=duration={duration}"
+    fps_cmd = f"fps=24"
+
+    # FFmpeg filter chain
+    code_ = (
+        f"[0:v]{loop_cmd},{trim_cmd},{fps_cmd},"
+        f"crop={crop_width}:{crop_height}:{start_x}:{start_y},"
+        f"scale={width}:{height}[out];"
+    )
+
+    # Build FFmpeg command
     cmd = [
-        "-i", str(input_path), 
-        "-c", "copy", "-map", "0", 
+        "-i", str(input_path),
+        "-filter_complex", code_,
+        "-map", "[out]",
         "-y", output_path
     ]
+
+    # Run FFmpeg
     ffmpeg.run('ffmpeg', cmd)
+
     return Video(output_path)
+
+
 
 
 class effect_get:
