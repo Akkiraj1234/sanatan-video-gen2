@@ -6,6 +6,7 @@ from video_gen.editor import (
     edit, 
     gen_trans_sub,
     typing_gen_trans_sub,
+    typing_gen_trans_sub_std,
     effect_get,
     add_video_info
 )
@@ -77,7 +78,7 @@ class Engine:
         )
         
         # mov = gen_trans_sub(
-        mov = typing_gen_trans_sub(
+        mov = typing_gen_trans_sub_std(
             text = text,
             audio = audio,
             timestamps = timestamps,

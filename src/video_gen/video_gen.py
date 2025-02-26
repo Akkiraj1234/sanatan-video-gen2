@@ -31,7 +31,7 @@ class generate_video:
             logger.error(f"Error during video creation: {e}")
             log_video_gen_error(data, e)
             self.failed_tasks.append((data, str(e)))
-            raise
+            raise e
             
         finally:
             logger.debug("Buffer cleaned after video generation.")

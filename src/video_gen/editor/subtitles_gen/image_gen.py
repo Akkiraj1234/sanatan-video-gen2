@@ -11,39 +11,6 @@ from PIL import Image, ImageDraw, ImageFont
 import time
 import subprocess
 
-
-# def create_image_with_word(
-#     word: str,
-#     image_size: tuple[int, int],
-#     position: tuple[int, int],
-#     font: ImageFont, 
-#     anchor: str = "nw",
-#     color: tuple[int, int, int, int] = (255, 255, 255, 255), 
-#     bg_color: tuple[int, int, int, int] = (0, 0, 0, 0),
-#     output_path: str = "output_image.png"
-# ) -> None:
-#     """
-#     Create a new RGBA image with a transparent background and draw a word on it.
-
-#     Args:
-#         word (str): The word to draw.
-#         image_size (tuple[int, int]): Size of the image (width, height).
-#         position (tuple[int, int]): (x, y) position on the image to place the word.
-#         font_path (str): Path to the font file (e.g., .ttf).
-#         font_size (int): Font size of the text.
-#         color (tuple[int, int, int, int]): RGBA color of the text (default is black, fully opaque).
-#         output_path (str): Path to save the output image.
-
-#     Returns:
-#         None: The function saves the created image to `output_path`.
-#     """
-#     image = Image.new("RGBA", image_size, bg_color) 
-#     draw = ImageDraw.Draw(image)
-
-#     draw.text(position, word, font=font, fill=color,anchor = anchor)
-#     image.save(output_path,)
-#     print(f"Image with word '{word}' created and saved to {output_path}.")
-
 def get_text_size(text: str, font:ImageFont) -> tuple[int, int]:
     """
     Calculates the dimensions of the text using the provided font.
@@ -278,6 +245,29 @@ def gen_trans_sub(
     return video
 
 
+# notes must be written here 
+
+
+class gen_Text_Frame:
+    
+    def __init__(self):
+        pass
+    
+    def gen_image(self):
+        pass
+    
+    
+    
+class gen_Text_Video:
+    
+    def __init__(self):
+        pass
+    
+    def __enter__(self):
+        return self
+    
+    def __exit__(self, *arg, **kw):
+        pass
 
 
 
@@ -371,48 +361,7 @@ def output_frame(frame, proc):
         cv2.imshow("Typing Effect", frame)
         cv2.waitKey(1)
 
-# def run_word_data_mode(word_data, font, width, height, background_color, padding,
-#                        text_color, shadow_color, shadow_offsets, border_thickness, border_color, fps,
-#                        final_hold_fraction=0.3):
-#     """
-#     Generator for word-data mode: for each word (with its time interval),
-#     yield frames that gradually reveal the word letter-by-letter.
-    
-#     For the final word, the animation runs faster (using fewer frames) and then holds the final frame
-#     for the remaining frames (as determined by final_hold_fraction).
-#     """
-#     accumulated_text = ""
-#     total_words = len(word_data)
-#     for idx, (start_time, end_time, word) in enumerate(word_data):
-#         is_last_word = (idx == total_words - 1)
-#         total_interval = end_time - start_time
-#         num_frames = max(int(round(total_interval * fps)), 1)
-#         if is_last_word:
-#             animate_frames = max(1, int(round(num_frames * (1 - final_hold_fraction))))
-#             hold_frames = num_frames - animate_frames
-#         else:
-#             animate_frames = num_frames
-#             hold_frames = 0
-        
-#         # Animate the current word letter-by-letter
-#         for frame_idx in range(1, animate_frames + 1):
-#             fraction = frame_idx / animate_frames
-#             partial_word = word[:max(1, int(len(word) * fraction))]
-#             current_text = (accumulated_text + " " + partial_word).strip() if accumulated_text else partial_word
-#             frame = create_text_frame(current_text, font, width, height, background_color, padding,
-#                                       text_color, shadow_color, shadow_offsets, border_thickness, border_color)
-#             yield frame, 1.0 / fps
-#         # Finalize the word
-#         accumulated_text = (accumulated_text + " " + word).strip() if accumulated_text else word
-#         # If last word, hold final frame for hold_frames; otherwise, yield one final frame
-#         frame = create_text_frame(accumulated_text, font, width, height, background_color, padding,
-#                                   text_color, shadow_color, shadow_offsets, border_thickness, border_color)
-#         if is_last_word:
-#             for _ in range(hold_frames):
-#                 yield frame, 1.0 / fps
-#         else:
-#             yield frame, 1.0 / fps
-def run_word_data_mode(word_data, font, width, height, background_color, padding,
+def typing_effect(word_data, font, width, height, background_color, padding,
                        text_color, shadow_color, shadow_offsets, border_thickness, border_color, fps,
                        final_hold_fraction=0.3):
     """
@@ -454,9 +403,21 @@ def run_word_data_mode(word_data, font, width, height, background_color, padding
         for _ in range(hold_frames):
             yield frame, 1.0 / fps
 
-def fallback_word_data_mode(word_data, font, width, height, background_color, padding,
-                       text_color, shadow_color, shadow_offsets, border_thickness, border_color, fps,
-                       final_hold_fraction=0.3):
+def fallback_word_data_mode(
+    word_data: List[Tuple[int,int,str]],
+    font: str,
+    width: int,
+    height: int,
+    background_color: str,
+    padding: int,
+    fps: int,
+    border_thickness: int,
+    text_color: tuple[int,int,int,int],
+    shadow_color: tuple[int,int,int,int], 
+    shadow_offsets: tuple[int,int,int,int],
+    border_color: tuple[int,int,int,int],
+    final_hold_fraction:float  = 0.3
+    ):
     """
     Generator for word-data mode: for each word, yield frames that gradually reveal the word.
     
@@ -466,6 +427,7 @@ def fallback_word_data_mode(word_data, font, width, height, background_color, pa
     """
     accumulated_text = ""
     total_words = len(word_data)
+    
     for idx, (start_time, end_time, word) in enumerate(word_data):
         is_last_word = (idx == total_words - 1)
         total_interval = end_time - start_time
@@ -495,8 +457,8 @@ def fallback_word_data_mode(word_data, font, width, height, background_color, pa
         # Hold the final frame for the remaining frames
         for _ in range(hold_frames):
             yield frame, 1.0 / fps
-
-def typing_effect(font_path, font_size, width, height, 
+            
+def sub(font_path, font_size, width, height, 
                   text_color=(255, 255, 255, 255), shadow_color=(50, 50, 50, 255),
                   background_color=(0, 0, 0, 0), animate_from_start=False,
                   output_path=None, fps=30, word_data=None, 
@@ -528,7 +490,7 @@ def typing_effect(font_path, font_size, width, height,
     proc = init_ffmpeg_pipe(output_path, width, height, fps, bg_music, word_data)
     
     if animate_from_start:
-        frame_gen = run_word_data_mode(word_data, font, width, height, background_color, padding,
+        frame_gen = typing_effect(word_data, font, width, height, background_color, padding,
                                        text_color, shadow_color, shadow_offsets, border_thickness, border_color, fps,
                                        final_hold_fraction=final_hold_fraction)
     else:
@@ -553,34 +515,394 @@ def typing_effect(font_path, font_size, width, height,
     return output_path  # Or return a Video object as needed
 
 
-def typing_gen_trans_sub(
-    text: str,
-    audio: Audio,
-    timestamps: List[Tuple[int, int, str]],
-    file_info: UserDict,
-    output_file: Path|str
-) -> Video:
-    width = file_info.width
-    height = file_info.height
-    padding = file_info.padding
-    font_color = hex_to_rgba(file_info.text_color)
+
+
+import cv2
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageChops
+import math, subprocess
+
+###############################
+# Helper Functions
+###############################
+
+def wrap_text(text, font, max_width):
+    """
+    Wraps the text into lines so that each line fits within max_width (in pixels).
+    If a word is too wide, it is split character-by-character.
+    Returns a list of strings.
+    """
+    words = text.split()
+    lines = []
+    current_line = ""
+    for word in words:
+        bbox_word = font.getbbox(word)
+        word_width = bbox_word[2] - bbox_word[0]
+        if word_width > max_width:
+            partial = ""
+            for char in word:
+                test = partial + char
+                test_width = font.getbbox(test)[2] - font.getbbox(test)[0]
+                if test_width <= max_width:
+                    partial = test
+                else:
+                    if current_line:
+                        test_line = current_line + " " + partial
+                        if font.getbbox(test_line)[2] - font.getbbox(test_line)[0] <= max_width:
+                            current_line = test_line
+                        else:
+                            lines.append(current_line)
+                            current_line = partial
+                    else:
+                        lines.append(partial)
+                        current_line = ""
+                    partial = char
+            if partial:
+                if current_line:
+                    test_line = current_line + " " + partial
+                    if font.getbbox(test_line)[2] - font.getbbox(test_line)[0] <= max_width:
+                        current_line = test_line
+                    else:
+                        lines.append(current_line)
+                        current_line = partial
+                else:
+                    current_line = partial
+        else:
+            test_line = current_line + (" " if current_line else "") + word
+            test_width = font.getbbox(test_line)[2] - font.getbbox(test_line)[0]
+            if test_width <= max_width:
+                current_line = test_line
+            else:
+                if current_line:
+                    lines.append(current_line)
+                current_line = word
+    if current_line:
+        lines.append(current_line)
+    return lines
+
+def generate_letter_overlay(letter_img, step, reveal_steps, transition_pixels, final_color):
+    """
+    Creates a dynamic overlay for the letter (or word) image (RGBA) that reveals it gradually.
+    Now supports final_color being an RGBA tuple.
+    """
+    fraction = step / reveal_steps
+    letter_np = np.array(letter_img)  # (H, W, 4)
+    H, W, _ = letter_np.shape
+    reveal_pos = int(W * fraction)
+
+    mask_line = np.zeros(W, dtype=np.float32)
+    for x in range(W):
+        if x < reveal_pos - transition_pixels/2:
+            mask_line[x] = 1.0
+        elif x > reveal_pos + transition_pixels/2:
+            mask_line[x] = 0.0
+        else:
+            rel = (x - (reveal_pos - transition_pixels/2)) / transition_pixels
+            mask_line[x] = 1.0 - rel
+            
+    mask_full = np.tile(mask_line, (H, 1))
+
+    # Determine if final_color has an alpha value:
+    if len(final_color) == 4:
+        final_rgb_arr = np.array(final_color[:3], dtype=np.float32)
+        final_alpha_val = final_color[3]
+    else:
+        final_rgb_arr = np.array(final_color, dtype=np.float32)
+        final_alpha_val = 255
+
+    overlay_colors = np.zeros((W, 3), dtype=np.float32)
+    for x in range(W):
+        phase = (x / W) * 2 * math.pi
+        r_cloud = 127 * (1 + math.sin(phase + fraction * 2 * math.pi))
+        g_cloud = 127 * (1 + math.sin(phase + fraction * 2 * math.pi + 2 * math.pi/3))
+        b_cloud = 127 * (1 + math.sin(phase + fraction * 2 * math.pi + 4 * math.pi/3))
+        cloudy = np.array([r_cloud, g_cloud, b_cloud], dtype=np.float32)
+        overlay_color = (1 - fraction) * cloudy + fraction * final_rgb_arr
+        overlay_colors[x] = np.clip(overlay_color, 0, 255)
+    overlay_img = np.tile(overlay_colors[None, :, :], (H, 1, 1)).astype(np.uint8)
+
+    letter_alpha = letter_np[:, :, 3:4] / 255.0
+    combined_mask = (mask_full[:, :, None] * letter_alpha).clip(0, 1)
+    final_rgb = (overlay_img.astype(np.float32) * combined_mask).astype(np.uint8)
+    final_alpha = (combined_mask * final_alpha_val).astype(np.uint8)
+    final_rgba = np.dstack([final_rgb, final_alpha])
+    return Image.fromarray(final_rgba, mode="RGBA")
+
+def apply_neon_glow(image, glow_layers=6, base_radius=5, intensity_decay=0.9):
+    """
+    Applies an omnidirectional neon glow to an RGBA image by additively blending
+    several blurred copies with increasing radii and decaying opacity.
+    (Lower glow layers and base radius help keep text sharp.)
+    """
+    base = image.convert("RGBA")
+    glow_accum = Image.new("RGBA", base.size, (0, 0, 0, 0))
+    for i in range(1, glow_layers + 1):
+        radius = base_radius * i
+        blurred = base.filter(ImageFilter.GaussianBlur(radius=radius))
+        np_blurred = np.array(blurred).astype(np.float32)
+        np_blurred[..., 3] *= (intensity_decay ** i)
+        np_blurred = np.clip(np_blurred, 0, 255).astype(np.uint8)
+        layer = Image.fromarray(np_blurred, mode="RGBA")
+        glow_accum = ImageChops.add(glow_accum, layer)
+    result = Image.alpha_composite(glow_accum, base)
+    return result
+
+def get_pulsating_neon(base_image, glow_layers, base_glow_radius, intensity_decay, pulsation_factor):
+    """
+    Applies neon glow to base_image with a scaled glow radius for pulsation.
+    """
+    return apply_neon_glow(base_image, glow_layers=glow_layers,
+                           base_radius=base_glow_radius * pulsation_factor,
+                           intensity_decay=intensity_decay)
+
+###############################
+# NeonWordAnimator Class
+###############################
+# This class takes a list of tuples (start, end, word) and reveals each word over its given duration.
+# It now also takes a parameter 'global_padding' that specifies the margin from the video edges,
+# so that all text is drawn within that padded region.
+
+class NeonWordAnimator:
+    def __init__(self, word_data, font_path, font_size, canvas_width, canvas_height,
+                 final_color=(255, 255, 255), bg_color=(0, 0, 0),
+                 pos="center", global_padding=20, space_between_words=10,
+                 transition_pixels=60, glow_layers=6, base_glow_radius=10, intensity_decay=0.8,
+                 extra_hold_time=0.2, fps=30,
+                 base_canvas_width=720, base_canvas_height=1280):
+        """
+        Initializes the animator.
+        
+        Parameters:
+          word_data: List of tuples (start, end, word). Each word is revealed over (end - start) seconds.
+          font_path: Path to a TTF font.
+          font_size: Base font size (for base_canvas_width).
+          canvas_width, canvas_height: Desired output canvas dimensions.
+          final_color: Final text color (RGB tuple).
+          bg_color: Background color.
+          pos: "center" or (x,y) for text block positioning (within the padded region).
+          global_padding: Padding (in pixels) from the video edges.
+          space_between_words: Space (in pixels) between words (before scaling).
+          transition_pixels: Base width (in pixels) for soft transition.
+          glow_layers: Number of glow layers.
+          base_glow_radius: Base radius for glow.
+          intensity_decay: Glow intensity decay factor.
+          extra_hold_time: Extra hold time (in seconds) after each word is fully revealed.
+          fps: Frames per second.
+          base_canvas_width, base_canvas_height: Reference canvas dimensions.
+        """
+        self.scale_w = canvas_width / base_canvas_width
+        self.scale_h = canvas_height / base_canvas_height
+        self.scale = (self.scale_w + self.scale_h) / 2.0
+        
+        self.word_data = word_data
+        self.canvas_width = canvas_width
+        self.canvas_height = canvas_height
+        self.fps = fps
+        
+        self.font_size = int(font_size * self.scale)
+        self.global_padding = int(global_padding * self.scale)
+        self.space_between_words = int(space_between_words * self.scale)
+        self.transition_pixels = int(transition_pixels * self.scale)
+        self.base_glow_radius = int(base_glow_radius * self.scale)
+        
+        self.final_color = final_color
+        self.bg_color = bg_color
+        self.pos = pos
+        self.glow_layers = glow_layers
+        self.intensity_decay = intensity_decay
+        self.extra_hold_frames = int(extra_hold_time * fps)
+        
+        self.font = ImageFont.truetype(font_path, self.font_size)
     
-    return typing_effect(
-        font_path = file_info.font_name,
-        font_size = file_info.font_size,
-        word_data = timestamps,
-        width = width,
-        height = height,
-        text_color = (255, 174, 66, 255),
-        shadow_color = (50,50,50,120),
-        border_color = (0,0,0,255),
-        animate_from_start=False,
-        output_path = str(output_file),
-        fps = file_info.fps,
-        padding = padding,
-        border_thickness=2,
-        bg_music= str(audio)
-    )
+    def _render_word(self, word):
+        """
+        Renders a word onto an RGBA image with extra margin for glow.
+        Returns (word_img, plain_width).
+        """
+        margin = self.base_glow_radius * self.glow_layers
+        bbox = self.font.getbbox(word)
+        word_width = bbox[2] - bbox[0]
+        word_height = bbox[3] - bbox[1]
+        new_width = word_width + 2 * margin
+        new_height = word_height + 2 * margin
+        word_img = Image.new("RGBA", (new_width, new_height), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(word_img)
+        draw.text((margin - bbox[0], margin - bbox[1]), word, font=self.font, fill=(255, 255, 255, 255))
+        return word_img, word_width
+    
+    def generate_frames(self):
+        """
+        Yields animation frames with wrapped and aligned text.
+        Words are split into lines if adding another word would exceed the available width.
+        """
+        global_frame = 0
+        # Create a composite image with an opaque background.
+        composite = Image.new("RGBA", (self.canvas_width, self.canvas_height), self.bg_color)
+        available_width = self.canvas_width - 2 * self.global_padding
+        available_height = self.canvas_height - 2 * self.global_padding
+
+        # Estimate line height (using a typical character and extra margin for glow)
+        char_bbox = self.font.getbbox("A")
+        base_line_height = char_bbox[3] - char_bbox[1]
+        line_height = base_line_height + self.base_glow_radius * self.glow_layers
+        vertical_spacing = 10  # adjust as needed
+
+        # Break word_data into lines that fit within available_width.
+        lines = []
+        current_line = []
+        current_line_width = 0
+        for (start_time, end_time, word) in self.word_data:
+            bbox = self.font.getbbox(word)
+            word_width = bbox[2] - bbox[0]
+            if current_line:
+                # Check if adding this word (plus space) exceeds available width.
+                if current_line_width + self.space_between_words + word_width > available_width:
+                    lines.append((current_line, current_line_width))
+                    current_line = [(start_time, end_time, word, word_width)]
+                    current_line_width = word_width
+                else:
+                    current_line_width += self.space_between_words + word_width
+                    current_line.append((start_time, end_time, word, word_width))
+            else:
+                current_line.append((start_time, end_time, word, word_width))
+                current_line_width = word_width
+        if current_line:
+            lines.append((current_line, current_line_width))
+
+        # Compute total text block height and starting y to center vertically.
+        total_text_height = len(lines) * line_height + (len(lines) - 1) * vertical_spacing
+        start_y = self.global_padding + (available_height - total_text_height) // 2
+
+        # Animate each line.
+        for line_words, line_width in lines:
+            # If centered, calculate starting x so the line is centered.
+            if self.pos == "center":
+                current_x = self.global_padding + (available_width - line_width) // 2
+            elif isinstance(self.pos, tuple):
+                current_x = self.pos[0]
+            else:
+                current_x = self.global_padding
+
+            # Animate each word in the line.
+            for (start_time, end_time, word, word_width) in line_words:
+                duration = end_time - start_time
+                reveal_frames = max(int(round(duration * self.fps)), 1)
+                word_img, _ = self._render_word(word)
+
+                # Animate reveal for this word.
+                for step in range(reveal_frames):
+                    frame = composite.copy().convert("RGB")
+                    pulsation = 1 + 0.2 * math.sin(2 * math.pi * global_frame / 60)
+                    colored_word = generate_letter_overlay(
+                        word_img, step, reveal_frames, self.transition_pixels, self.final_color
+                    )
+                    neon_word = apply_neon_glow(
+                        colored_word,
+                        glow_layers=self.glow_layers,
+                        base_radius=self.base_glow_radius * pulsation,
+                        intensity_decay=self.intensity_decay,
+                    )
+                    # Paste word with appropriate offsets (including margin for glow)
+                    frame.paste(
+                        neon_word,
+                        (int(current_x - self.base_glow_radius * self.glow_layers),
+                         int(start_y - self.base_glow_radius * self.glow_layers)),
+                        neon_word,
+                    )
+                    yield frame
+                    global_frame += 1
+
+                # Extra hold frames for this word.
+                for _ in range(self.extra_hold_frames):
+                    frame = composite.copy().convert("RGB")
+                    neon_word = apply_neon_glow(
+                        generate_letter_overlay(
+                            word_img, reveal_frames, reveal_frames, self.transition_pixels, self.final_color
+                        ),
+                        glow_layers=self.glow_layers,
+                        base_radius=self.base_glow_radius,
+                        intensity_decay=self.intensity_decay,
+                    )
+                    frame.paste(
+                        neon_word,
+                        (int(current_x - self.base_glow_radius * self.glow_layers),
+                         int(start_y - self.base_glow_radius * self.glow_layers)),
+                        neon_word,
+                    )
+                    yield frame
+                    global_frame += 1
+
+                # Update composite image with the fully revealed word.
+                full_word = generate_letter_overlay(
+                    word_img, reveal_frames, reveal_frames, self.transition_pixels, self.final_color
+                )
+                full_neon = apply_neon_glow(
+                    full_word,
+                    glow_layers=self.glow_layers,
+                    base_radius=self.base_glow_radius,
+                    intensity_decay=self.intensity_decay,
+                )
+                composite.paste(
+                    full_neon,
+                    (int(current_x - self.base_glow_radius * self.glow_layers),
+                     int(start_y - self.base_glow_radius * self.glow_layers)),
+                    full_neon,
+                )
+                current_x += word_width + self.space_between_words
+
+            # Move down to the next line.
+            start_y += line_height + vertical_spacing
+        
+        # Optionally, a final hold phase could be added here.
+        
+####################################
+# FFmpeg Video Writer
+####################################
+def write_video_ffmpeg(frame_generator, output_path, width, height, fps=30, audio_path=None):
+    """
+    Pipes frames from frame_generator to ffmpeg to create a video.
+    If audio_path is provided, it will be muxed.
+    """
+    command = [
+        "ffmpeg",
+        "-y",
+        "-f", "rawvideo",
+        "-vcodec", "rawvideo",
+        "-pix_fmt", "bgr24",
+        "-s", f"{width}x{height}",
+        "-r", str(fps),
+        "-i", "-",
+    ]
+    if audio_path:
+        command.extend([
+            "-i", audio_path,
+            "-c:v", "libx264",
+            "-preset", "slow",
+            "-crf", "18",
+            "-c:a", "aac",
+            "-b:a", "192k",
+            "-pix_fmt", "yuv420p",
+            output_path
+        ])
+    else:
+        command.extend([
+            "-an",
+            "-c:v", "libx264",
+            "-preset", "slow",
+            "-crf", "18",
+            "-pix_fmt", "yuv420p",
+            output_path
+        ])
+    
+    process = subprocess.Popen(command, stdin=subprocess.PIPE, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    for frame in frame_generator:
+        frame_np = cv2.cvtColor(np.array(frame), cv2.COLOR_RGB2BGR)
+        try:
+            process.stdin.write(frame_np.tobytes())
+        except BrokenPipeError:
+            break
+    process.stdin.close()
+    process.wait()
 
 
 def typing_gen_trans_sub_std(
@@ -593,9 +915,45 @@ def typing_gen_trans_sub_std(
     width = file_info.width
     height = file_info.height
     padding = file_info.padding
+        
+    animator = NeonWordAnimator(
+        word_data=timestamps,
+        font_path=file_info.font_name,
+        font_size=file_info.font_size,
+        canvas_width=width,
+        canvas_height=height,
+        final_color= (255, 174, 66, 255),
+        bg_color=(0,0,0,0),
+        pos="center",
+        global_padding=padding,
+        space_between_words=10,
+        transition_pixels=60,
+        glow_layers=8,
+        base_glow_radius=20,
+        intensity_decay=0.8,
+        extra_hold_time=0.2,
+        fps=file_info.fps,
+        base_canvas_width=width,
+        base_canvas_height=height
+    )
+    output_video = "neon_word_video.mp4"
+    frame_gen = animator.generate_frames()
+    write_video_ffmpeg(frame_gen, output_file, width, height, file_info.fps, str(audio))
+    return Video(output_file)
+
+def typing_gen_trans_sub(
+    text: str,
+    audio: Audio,
+    timestamps: List[Tuple[int, int, str]],
+    file_info: UserDict,
+    output_file: Path|str
+) -> Video:
+    width = file_info.width
+    height = file_info.height
+    padding = file_info.padding
     font_color = hex_to_rgba(file_info.text_color)
     
-    return typing_effect(
+    return sub(
         font_path = file_info.font_name,
         font_size = file_info.font_size,
         word_data = timestamps,
@@ -611,44 +969,3 @@ def typing_gen_trans_sub_std(
         border_thickness=2,
         bg_music= str(audio)
     )
-
-
-
-# Example usage for word_data mode:
-# if __name__ == "__main__":
-#     FONT_PATH = "some-ebold.ttf"  # Ensure the font file exists
-#     word_data_example = [
-#         (0.0, 0.498, 'इसके'),
-#         (0.498, 0.996, 'कारण'),
-#         (0.996, 1.495, 'उनका'),
-#         (1.495, 1.993, 'कंठ'),
-#         (1.993, 2.492, 'नीला'),
-#         (2.492, 2.99, 'हो'),
-#         (2.99, 3.489, 'गया'),
-#         (3.489, 3.987, 'और'),
-#         (3.987, 4.486, 'उन्हें'),
-#         (4.486, 4.984, "'नीलकंठ'"),
-#         (4.984, 5.483, 'कहा'),
-#         (5.483, 5.981, 'जाने'),
-#         (5.981, 6.48, 'लगा।')
-#     ]
-#     normal_color = (255, 255, 255, 255)
-    
-#     # To generate a transparent MOV video (~6.48 sec) with background music and a text border:
-#     typing_effect(
-# text="", 
-# font_path=FONT_PATH, 
-# font_size=50,
-# width=720, 
-# height=1080,
-# text_color=normal_color, 
-# shadow_color=(50,50,50,255), 
-# background_color=(0,0,0,0),
-# animate_from_start=True, 
-# output_path='output.mov', 
-# fps=30,
-# word_data=word_data_example, 
-# padding=40, 
-# border_thickness=2,
-# border_color=(0,0,0,255),
-# bg_music=None)

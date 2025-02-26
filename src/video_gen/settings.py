@@ -110,7 +110,7 @@ setting = AttrDict(
     {
         "VIDEO_ENGION": "gen1",
         "DEBUG": False,
-        "TTS_MODLE": "ElevenLabsModel1", #"GTTSModel", #,ElevenLabsModel1
+        "TTS_MODLE": "GTTSModel", #"GTTSModel", #,ElevenLabsModel1
         "TIMESTAMPS_MODLE": "basic1",
         "TTS_Lang": "hi",
         "TTS_ELVENLABS_VOICE_ID": "y6Ao4Y93UrnTbmzdVlFc", #"FmBhnvP58BK0vz65OOj7", #"Sm1seazb4gs7RSlUVw7c",
