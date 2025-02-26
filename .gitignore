@@ -4,6 +4,4 @@
 *.log
 *.env
 __pycache__/
-/assets/
-/test/
 /temp
