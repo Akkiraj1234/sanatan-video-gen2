@@ -1,7 +1,9 @@
 /venv/
+/.venv/
 *.pyc
 *.ini
 *.log
 *.env
 __pycache__/
 /temp
+/.old_src

@@ -183,13 +183,13 @@ files = [
 
 [[package]]
 name = "elevenlabs"
-version = "1.51.0"
+version = "1.52.0"
 description = ""
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "elevenlabs-1.51.0-py3-none-any.whl", hash = "sha256:3c500e08f4fb9cf3503617fd5f150e0fe574ca6670a5bc28eb4a440e3491c453"},
-    {file = "elevenlabs-1.51.0.tar.gz", hash = "sha256:a5093dbce5c8a40694424266bae5a16792b20994b221647d7e85676be37df32b"},
+    {file = "elevenlabs-1.52.0-py3-none-any.whl", hash = "sha256:9c83fe1b8cc6cd9f687fe055aae0fa2fe68f598bc7464fa30dda28e9be8413d2"},
+    {file = "elevenlabs-1.52.0.tar.gz", hash = "sha256:af1fcd8d450fb69e0ffff271bc6bea7cee3e63a938da5949cd23466cff5337e2"},
 ]
 
 [package.dependencies]
@@ -241,17 +241,18 @@ dotenv = ["python-dotenv"]
 
 [[package]]
 name = "flask-cors"
-version = "5.0.0"
-description = "A Flask extension adding a decorator for CORS support"
+version = "5.0.1"
+description = "A Flask extension simplifying CORS support"
 optional = false
-python-versions = "*"
+python-versions = "<4.0,>=3.9"
 files = [
-    {file = "Flask_Cors-5.0.0-py2.py3-none-any.whl", hash = "sha256:b9e307d082a9261c100d8fb0ba909eec6a228ed1b60a8315fd85f783d61910bc"},
-    {file = "flask_cors-5.0.0.tar.gz", hash = "sha256:5aadb4b950c4e93745034594d9f3ea6591f734bb3662e16e255ffbf5e89c88ef"},
+    {file = "flask_cors-5.0.1-py3-none-any.whl", hash = "sha256:fa5cb364ead54bbf401a26dbf03030c6b18fb2fcaf70408096a572b409586b0c"},
+    {file = "flask_cors-5.0.1.tar.gz", hash = "sha256:6ccb38d16d6b72bbc156c1c3f192bc435bfcc3c2bc864b2df1eb9b2d97b2403c"},
 ]
 
 [package.dependencies]
-Flask = ">=0.9"
+flask = ">=0.9"
+Werkzeug = ">=0.7"
 
 [[package]]
 name = "gtts"
