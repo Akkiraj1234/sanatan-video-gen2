@@ -1,5 +1,5 @@
 {
-    "VIDEO_ENGINE": "none lol",
+    "VIDEO_ENGINE": "gen1",
     "DEBUG": false,
     "TTS_MODEL": "GTTSModel",
     "TIMESTAMPS_MODEL": "basic1",

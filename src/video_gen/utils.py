@@ -12,6 +12,17 @@ import os
 logger = logging.getLogger(__name__)
 
 
+def get_error_details(e):
+    tb = e.__traceback__
+    while tb.tb_next:
+        tb = tb.tb_next
+    lineno = tb.tb_lineno
+    module_name = tb.tb_frame.f_globals["__name__"]
+    return module_name, lineno
+
+def some_error():
+    raise ArithmeticError("some error for testing u know testing")
+
 def project_root() -> Path:
     """
     Returns the absolute path of the project root directory.

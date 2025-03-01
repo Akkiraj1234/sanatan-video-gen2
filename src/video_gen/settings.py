@@ -7,11 +7,13 @@ from video_gen.utils import (
 from video_gen.error import ConfigError
 from typing import List, Dict, Optional, Union, Any
 from threading import Lock
+import logging
 import sys
 
 
 # List of directories where configuration files may be located
 _CONFIG_PATHS = [".", Path.home().joinpath(".video_gen")]
+logger = logging.getLogger(__name__)
 
 # Default configuration settings
 DEFAULT_SETTINGS = {
@@ -45,10 +47,10 @@ def check_paths_exists(path_list: List[Union[str, Path]], file_name: str) -> Opt
 
         path = Path(path) 
         if (path / file_name).exists():
-            print(f"Config file found at: {path / file_name}")
+            logger.info(f"Config file found at: {path / file_name}")
             return path / file_name
         
-    print("No existing config file found.")
+    logger.warning("No existing config file found.")
     return None
 
 
@@ -68,7 +70,6 @@ def create_path_FA(paths: List[Union[str, Path]], config_name: str, config_data:
     Raises:
         ConfigError: If the configuration file cannot be created in any of the given directories.
     """
-    config_error_list = []
     for path in paths:
         path = Path(path)
         config_file_path = path / config_name
@@ -79,21 +80,33 @@ def create_path_FA(paths: List[Union[str, Path]], config_name: str, config_data:
             path.mkdir(parents=True, exist_ok=True)
             # Finally, write JSON to the config file path.
             write_json(config_file_path, config_data)
-            print(f"Config file successfully created at: {config_file_path}")
+            logger.info(f"Config file successfully created at: {config_file_path}")
             return config_file_path
         
         except Exception as e:
-            config_error_list.append(f"Failed to create config at {str(config_file_path)}: {e}\n")
+            logger.debug(f"Failed to create config at {str(config_file_path)}: {e}")
             continue
         
-    raise ConfigError(f"Failed to create configuration file in any of the provided paths : \n{''.join(config_error_list)}")
+    raise ConfigError(f"Failed to create configuration file in any of the provided paths : \n{''.join(paths)}")
 
+
+def load_and_validate(config_path: Union[str, Path]) -> Dict:
+    data = get_json_data(file_path = config_path)
+    validate_data = DEFAULT_SETTINGS.copy()
+    validate_data.update(data)
+    # upation should be good but with each time
+    # the software gonna open doing it isnt ryt 
+    # so just returning validate data for rn
+    # setting_update(validate_data)
+    logger.info(f"Configuration data loaded and validated from: {config_path}")
+    return validate_data
+    
 
 def setting_init(
     paths_list: Optional[List[Union[str, Path]]] = None,
     create: bool = True,
     location_first_priority: str = '.'
-) -> AttrDict:
+) -> 'Setting':
     """
     Initializes and loads configuration settings from a file.
     
@@ -126,7 +139,7 @@ def setting_init(
         raise ConfigError("Configuration file not found and creation is disabled.")
     
     elif create and config_path is None:
-        print("No config file found. Attempting to create a new one.")
+        logger.info("No config file found. Attempting to create a new one.")
         config_path = create_path_FA(
             paths = [location_first_priority] + path_list,
             config_name = config_name, 
@@ -135,10 +148,12 @@ def setting_init(
     
     # saving the info..
     global _config_path, _loaded_dict
+    # _loaded_dict = AttrDict(get_json_data(config_path))
     _config_path = config_path
-    _loaded_dict = AttrDict(get_json_data(config_path))
-    print(f"Config settings loaded from: {_config_path}")
-    return _loaded_dict
+    _loaded_dict = AttrDict(load_and_validate(config_path))
+    
+    logger.info(f"Config settings loaded from: {_config_path}")
+    return setting
     
 
 def setting_reload() -> None:
@@ -152,7 +167,7 @@ def setting_reload() -> None:
     
     global _loaded_dict
     _loaded_dict = AttrDict(get_json_data(_config_path))
-    print("Settings reloaded successfully.")
+    logger.info("Settings reloaded successfully.")
 
 
 def setting_update(new_data: Dict[str, Any]) -> None:
@@ -171,7 +186,7 @@ def setting_update(new_data: Dict[str, Any]) -> None:
     
     write_json(_config_path, copyied_data)
     _loaded_dict = AttrDict(copyied_data)
-    print(f"Settings updated: {copyied_data}")
+    logger.info(f"Settings updated: {copyied_data}")
 
 
 class Setting:
@@ -245,7 +260,11 @@ setting = Setting()
 # functions to only be accessed
 __all__ = ['setting_init', 'setting_reload', 'setting_update', 'DEFAULT_SETTINGS', 'setting']
 
+
 # # It's to help encapsulate some attributes that shouldn't be accessed directly
+# # currently not in use its not sure yet if weather i should use it or not
+# # since python doesnt come up with private variable creation so idk.
+# # this isnt make it private either its not 100% safe can be assessed eassily
 # class RestrictedModule:
 #     def __init__(self, module):
 #         self._module = module
