@@ -1,0 +1,12 @@
+{
+    "VIDEO_ENGINE": "none lol",
+    "DEBUG": false,
+    "TTS_MODEL": "GTTSModel",
+    "TIMESTAMPS_MODEL": "basic1",
+    "TTS_LANG": "hi",
+    "TTS_ELEVENLABS_VOICE_ID": "y6Ao4Y93UrnTbmzdVlFc",
+    "TTS_ELEVENLABS_MODEL_ID": "eleven_turbo_v2_5",
+    "ASSETS_PATH": "/home/akkiraj/video-gen/assets",
+    "TEMP_PATH": "/home/akkiraj/video-gen/temp",
+    "SETTING_LOG_PATH": "/home/akkiraj/video-gen/error.log"
+}

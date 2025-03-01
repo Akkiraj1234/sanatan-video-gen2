@@ -5,6 +5,7 @@ from colorama import Fore, Style
 from pathlib import Path
 import logging
 import json
+import shutil
 import uuid
 import os
 
@@ -37,13 +38,6 @@ def validate_file(file_path:str) -> bool:
     """
     return os.path.exists(file_path)
 
-def write_json(file_path: str, data: Dict[Any]) -> None:
-    """
-    write robust json file with error handeling
-    """
-    with open(file_path, "w") as f:
-        json.dump(data, f, indent=4)
-
 def copy_file(old_location:Path|str, new_location:Path|str) -> Path:
     """
     copy a file to another location
@@ -55,6 +49,60 @@ def copy_file(old_location:Path|str, new_location:Path|str) -> Path:
             dest_file.write(content)
     
     return new_location if isinstance(new_location, Path) else Path(new_location)
+
+def write_json(file_path: Path, data: Dict[str, Any]) -> None:
+    """
+    Safely writes a dictionary to a JSON file using an atomic write strategy.
+    
+    This method writes data to a temporary file first and then replaces the original file,
+    ensuring that no partial writes occur and preventing data corruption.
+
+    Args:
+        file_path (Path): The path to the JSON file.
+        data (Dict[str, Any]): The data to be written to the file.
+
+    Raises:
+        OSError: If an error occurs during file writing.
+    """
+    temp_path = file_path.with_suffix(file_path.suffix + ".tmp")
+
+    try:
+        # Write to a temporary file first to prevent data loss on failure
+        with temp_path.open("w", encoding="utf-8") as temp_file:
+            json.dump(data, temp_file, indent=4)
+
+        # Atomically replace the original file
+        shutil.move(temp_path, file_path)
+
+    except OSError as e:
+        # Ensure temp file is removed in case of failure
+        if temp_path.exists():
+            temp_path.unlink(missing_ok=True)
+        raise OSError(f"Failed to write JSON to {file_path}: {e}")
+
+def get_json_data(file_path: Path) -> Dict[str, Any]:
+    """
+    Reads a JSON file and returns its content as a dictionary.
+
+    Args:
+        file_path (Path): The path to the JSON file.
+
+    Returns:
+        Dict[str, Any]: The data read from the file.
+
+    Raises:
+        FileNotFoundError: If the file does not exist.
+        json.JSONDecodeError: If the file is not a valid JSON format.
+    """
+    if not file_path.exists():
+        raise FileNotFoundError(f"JSON file not found: {file_path}")
+
+    try:
+        with file_path.open("r", encoding="utf-8") as file:
+            return json.load(file)
+        
+    except json.JSONDecodeError as e:
+        raise json.JSONDecodeError(f"Failed to parse JSON file {file_path}: {e}", doc="", pos=0)
 
 def log_video_gen_error(data: dict = {}, error_message: str = '', reason: str = '') -> None:
     """
@@ -266,9 +314,6 @@ class TempFile:
         """
         self.delete()
 
-
-import os
-from video_gen.utils import TempFile  # Import TempFile class
 
 class SafeFile:
     """

@@ -57,3 +57,7 @@ class VideoProcessingError(VideoGenError):
     """Raised when an error occurs during video processing."""
     def __init__(self, message="An error occurred while processing the video."):
         super().__init__(message)
+
+class ConfigError(Exception):
+    """Custom exception for configuration-related errors."""
+    pass
